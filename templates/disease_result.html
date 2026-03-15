@@ -2,334 +2,241 @@
 {% block content %}
 
 <style>
-    .fd-hero {
+    .result-hero {
         background: linear-gradient(135deg, #1e3a5f 0%, #0d6e6e 100%);
-        padding: 48px 0 36px;
+        padding: 40px 0 30px;
         color: white;
     }
-    .fd-hero h1 { font-size: 2.2rem; font-weight: 800; }
-    .fd-hero p  { color: rgba(255,255,255,0.75); font-size: 1.05rem; }
+    .result-hero h1 { font-size: 2rem; font-weight: 800; }
 
-    .fd-card {
+    .disease-card {
         border: none;
-        border-radius: 18px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        border-radius: 16px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow: hidden;
     }
-    .fd-section-title {
-        font-size: 13px;
+    .disease-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+    }
+
+    /* Risk bar */
+    .risk-bar-wrap {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .risk-bar-fill {
+        height: 100%;
+        border-radius: 8px;
+        transition: width 1s ease;
+    }
+
+    /* Risk level colours */
+    .risk-critical .risk-bar-fill { background: #dc3545; }
+    .risk-high     .risk-bar-fill { background: #fd7e14; }
+    .risk-medium   .risk-bar-fill { background: #ffc107; }
+    .risk-low      .risk-bar-fill { background: #28a745; }
+
+    .badge-critical { background:#dc3545; color:white; }
+    .badge-high     { background:#fd7e14; color:white; }
+    .badge-medium   { background:#ffc107; color:#333; }
+    .badge-low      { background:#28a745; color:white; }
+
+    .rank-badge {
+        width: 34px; height: 34px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+        font-weight: 800; font-size: 15px;
+        flex-shrink: 0;
+    }
+    .rank-1 { background: #dc3545; color: white; }
+    .rank-2 { background: #fd7e14; color: white; }
+    .rank-3 { background: #ffc107; color: #333; }
+    .rank-other { background: #e9ecef; color: #555; }
+
+    .section-title {
+        font-size: 12.5px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1.2px;
         color: #0d6e6e;
-        margin-bottom: 14px;
-        padding-bottom: 6px;
+        padding-bottom: 8px;
         border-bottom: 2px solid #e8f5f5;
+        margin-bottom: 18px;
     }
-    .form-label { font-weight: 600; font-size: 13.5px; color: #444; }
-    .form-control, .form-select {
-        border-radius: 10px;
-        border: 1.5px solid #dee2e6;
-        font-size: 14px;
-        padding: 10px 14px;
-        transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: #0d6e6e;
-        box-shadow: 0 0 0 3px rgba(13,110,110,0.12);
-    }
-    .input-group-text {
-        background: #f0fafa;
-        border-color: #dee2e6;
-        color: #0d6e6e;
-        font-size: 14px;
-        border-radius: 10px 0 0 10px;
-    }
-    .input-group .form-control  { border-radius: 0 10px 10px 0; }
-    .input-group .form-select   { border-radius: 0 10px 10px 0; }
 
-    .range-value {
-        display: inline-block;
-        min-width: 38px;
-        text-align: center;
-        font-weight: 700;
-        color: #0d6e6e;
-        font-size: 15px;
-    }
-    .info-box {
-        background: #f0fafa;
-        border-left: 4px solid #0d6e6e;
-        border-radius: 10px;
-        padding: 14px 18px;
-        font-size: 13.5px;
-        color: #444;
-    }
-    .btn-analyse {
-        background: linear-gradient(135deg, #0d6e6e, #1e3a5f);
+    .cat-card {
         border: none;
-        border-radius: 50px;
-        padding: 14px 48px;
-        font-size: 16px;
-        font-weight: 700;
-        color: white;
-        transition: opacity 0.2s, transform 0.15s;
+        border-radius: 14px;
+        border-top: 4px solid #0d6e6e;
+        transition: transform 0.2s;
     }
-    .btn-analyse:hover {
-        opacity: 0.9; transform: translateY(-2px); color: white;
-    }
-    .badge-count {
-        background: rgba(255,255,255,0.2);
-        border-radius: 20px;
-        padding: 4px 14px;
+    .cat-card:hover { transform: translateY(-3px); }
+
+    .metric-pill {
+        background: #f0fafa;
+        border-radius: 8px;
+        padding: 8px 14px;
         font-size: 13px;
         font-weight: 600;
+        color: #1e3a5f;
     }
+    .metric-pill span { color: #0d6e6e; font-weight: 800; }
 </style>
 
 <!-- Hero -->
-<div class="fd-hero">
+<div class="result-hero">
     <div class="container">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div>
-                <h1><i class="fas fa-microscope me-3"></i>64-Disease Analyser</h1>
-                <p class="mb-0">Enter your health metrics to find which of 64 diseases you may be at risk for.</p>
-            </div>
-            <span class="badge-count"><i class="fas fa-database me-2"></i>64 Diseases Loaded</span>
-        </div>
+        <h1><i class="fas fa-microscope me-3"></i>Disease Analysis Results</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,0.75);">
+            Top disease risks identified from your 64-disease analysis engine.
+        </p>
     </div>
 </div>
 
 <div class="container py-5">
-    <form action="/predict_disease" method="POST">
 
-        <div class="row g-4">
+    <!-- ── METRICS RECAP ── -->
+    <div class="d-flex flex-wrap gap-2 mb-5">
+        <div class="metric-pill"><i class="fas fa-birthday-cake me-1"></i> Age: <span>{{ user_data.age | int }}</span></div>
+        <div class="metric-pill"><i class="fas fa-weight me-1"></i> BMI: <span>{{ user_data.bmi }}</span></div>
+        <div class="metric-pill"><i class="fas fa-tachometer-alt me-1"></i> BP: <span>{{ user_data.bp_sys | int }}/{{ user_data.bp_dias | int }}</span> mmHg</div>
+        <div class="metric-pill"><i class="fas fa-tint me-1"></i> Glucose: <span>{{ user_data.glucose | int }}</span> mg/dL</div>
+        <div class="metric-pill"><i class="fas fa-bed me-1"></i> Sleep: <span>{{ user_data.sleep_hours }}h</span></div>
+        <div class="metric-pill"><i class="fas fa-running me-1"></i> Activity: <span>{{ user_data.activity_mins | int }} mins</span></div>
+    </div>
 
-            <!-- ── LEFT COLUMN ── -->
-            <div class="col-lg-6">
+    <!-- ── TOP 10 DISEASES ── -->
+    <p class="section-title"><i class="fas fa-list-ol me-2"></i>Top 10 Risk Diseases</p>
 
-                <!-- Basic Info -->
-                <div class="card fd-card p-4 mb-4">
-                    <p class="fd-section-title"><i class="fas fa-user me-2"></i>Basic Information</p>
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="form-label">Age</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-birthday-cake"></i></span>
-                                <input type="number" name="age" class="form-control"
-                                       placeholder="e.g. 35" min="1" max="120" required>
-                            </div>
+    {% if top_diseases %}
+    <div class="row g-3 mb-5">
+        {% for disease in top_diseases %}
+        {% set rank = loop.index %}
+        {% set score = disease.score if disease.score is defined else disease.risk_score if disease.risk_score is defined else 0 %}
+        {% set name  = disease.name  if disease.name  is defined else disease.disease if disease.disease is defined else 'Unknown' %}
+        {% set risk  = disease.risk_level if disease.risk_level is defined else 'Medium' %}
+
+        <div class="col-lg-6">
+            <div class="card disease-card shadow-sm p-3
+                {% if score >= 75 %}risk-critical
+                {% elif score >= 50 %}risk-high
+                {% elif score >= 30 %}risk-medium
+                {% else %}risk-low{% endif %}">
+                <div class="d-flex align-items-start gap-3">
+
+                    <!-- Rank badge -->
+                    <div class="rank-badge
+                        {% if rank == 1 %}rank-1
+                        {% elif rank == 2 %}rank-2
+                        {% elif rank == 3 %}rank-3
+                        {% else %}rank-other{% endif %}">
+                        {{ rank }}
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 fw-bold text-dark">{{ name }}</h6>
+                            <span class="badge rounded-pill
+                                {% if score >= 75 %}badge-critical
+                                {% elif score >= 50 %}badge-high
+                                {% elif score >= 30 %}badge-medium
+                                {% else %}badge-low{% endif %}">
+                                {% if score >= 75 %}Critical
+                                {% elif score >= 50 %}High
+                                {% elif score >= 30 %}Medium
+                                {% else %}Low{% endif %}
+                            </span>
                         </div>
-                        <div class="col-6">
-                            <label class="form-label">Weight (kg)</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-weight"></i></span>
-                                <input type="number" name="weight" class="form-control"
-                                       placeholder="e.g. 70" min="20" max="300" step="0.1" required>
-                            </div>
+
+                        <!-- Risk bar -->
+                        <div class="risk-bar-wrap mb-1">
+                            <div class="risk-bar-fill"
+                                 style="width: {{ [score, 100] | min }}%"></div>
                         </div>
-                        <div class="col-6">
-                            <label class="form-label">Height (cm)</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-ruler-vertical"></i></span>
-                                <input type="number" name="height" class="form-control"
-                                       placeholder="e.g. 170" min="100" max="250" step="0.1" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Fasting Glucose (mg/dL)</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-tint"></i></span>
-                                <input type="number" name="glucose" class="form-control"
-                                       placeholder="e.g. 95" min="40" max="500" step="0.1" required>
-                            </div>
-                        </div>
+                        <small class="text-muted">Risk Score: <strong>{{ score | round(1) }}%</strong></small>
+
+                        {% if disease.reason %}
+                        <p class="mb-0 mt-1 text-muted" style="font-size:12px;">
+                            <i class="fas fa-info-circle me-1"></i>{{ disease.reason }}
+                        </p>
+                        {% endif %}
                     </div>
                 </div>
-
-                <!-- Blood Pressure -->
-                <div class="card fd-card p-4 mb-4">
-                    <p class="fd-section-title"><i class="fas fa-tachometer-alt me-2"></i>Blood Pressure</p>
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="form-label">Systolic (mmHg)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">SYS</span>
-                                <input type="number" name="bp_sys" class="form-control"
-                                       placeholder="e.g. 120" min="70" max="220" required>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Diastolic (mmHg)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">DIA</span>
-                                <input type="number" name="bp_dias" class="form-control"
-                                       placeholder="e.g. 80" min="40" max="140" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="info-box mt-3">
-                        <i class="fas fa-info-circle text-info me-2"></i>
-                        Normal BP is around <strong>120/80 mmHg</strong>.
-                        If unsure, use our
-                        <a href="/calculators" class="text-decoration-none fw-bold" style="color:#0d6e6e;">
-                            BP Calculator</a> first.
-                    </div>
-                </div>
-
-                <!-- Lifestyle -->
-                <div class="card fd-card p-4 mb-4">
-                    <p class="fd-section-title"><i class="fas fa-running me-2"></i>Lifestyle</p>
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="form-label">Sleep Hours / night</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="range" name="sleep_hours" class="form-range flex-grow-1"
-                                       min="2" max="12" step="0.5" value="7"
-                                       oninput="document.getElementById('sleepVal').textContent=this.value">
-                                <span class="range-value" id="sleepVal">7</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Screen Time (hrs/day)</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="range" name="screen_time" class="form-range flex-grow-1"
-                                       min="0" max="16" step="0.5" value="6"
-                                       oninput="document.getElementById('screenVal').textContent=this.value">
-                                <span class="range-value" id="screenVal">6</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Activity (mins/day)</label>
-                            <div class="d-flex align-items-center gap-2">
-                                <input type="range" name="activity_mins" class="form-range flex-grow-1"
-                                       min="0" max="180" step="5" value="30"
-                                       oninput="document.getElementById('actVal').textContent=this.value">
-                                <span class="range-value" id="actVal">30</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Stress Level</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-brain"></i></span>
-                                <select name="stress_level" class="form-select">
-                                    <option value="Low">Low</option>
-                                    <option value="Medium" selected>Medium</option>
-                                    <option value="High">High</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- ── RIGHT COLUMN ── -->
-            <div class="col-lg-6">
-
-                <!-- Habits -->
-                <div class="card fd-card p-4 mb-4">
-                    <p class="fd-section-title"><i class="fas fa-smoking me-2"></i>Habits</p>
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="form-label">Smoking</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-smoking"></i></span>
-                                <select name="smoking" class="form-select">
-                                    <option value="no">No</option>
-                                    <option value="yes">Yes</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Alcohol Intake</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-wine-glass"></i></span>
-                                <select name="alcohol" class="form-select">
-                                    <option value="none">None</option>
-                                    <option value="occasional">Occasional</option>
-                                    <option value="moderate">Moderate</option>
-                                    <option value="heavy">Heavy</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Disease categories info box -->
-                <div class="card fd-card p-4 mb-4"
-                     style="background:linear-gradient(135deg,#f0fafa,#e8f5f5);">
-                    <p class="fd-section-title"><i class="fas fa-list-alt me-2"></i>What We Analyse</p>
-                    <div class="row g-2 text-center">
-                        <div class="col-6">
-                            <div class="p-2 rounded bg-white shadow-sm">
-                                <i class="fas fa-heartbeat text-danger mb-1 d-block"></i>
-                                <small class="fw-bold text-muted">Cardiovascular</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-2 rounded bg-white shadow-sm">
-                                <i class="fas fa-tint text-warning mb-1 d-block"></i>
-                                <small class="fw-bold text-muted">Metabolic</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-2 rounded bg-white shadow-sm">
-                                <i class="fas fa-bed text-primary mb-1 d-block"></i>
-                                <small class="fw-bold text-muted">Sleep &amp; Neuro</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-2 rounded bg-white shadow-sm">
-                                <i class="fas fa-lungs text-info mb-1 d-block"></i>
-                                <small class="fw-bold text-muted">Respiratory</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-2 rounded bg-white shadow-sm">
-                                <i class="fas fa-brain text-success mb-1 d-block"></i>
-                                <small class="fw-bold text-muted">Mental Health</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-2 rounded bg-white shadow-sm">
-                                <i class="fas fa-bone text-secondary mb-1 d-block"></i>
-                                <small class="fw-bold text-muted">Musculoskeletal</small>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-muted mt-3 mb-0" style="font-size:12.5px;">
-                        <i class="fas fa-shield-alt me-1 text-success"></i>
-                        Analysis covers <strong>64 diseases</strong> across 6+ medical categories
-                        using your biometric and lifestyle data.
-                    </p>
-                </div>
-
-                <!-- Disclaimer -->
-                <div class="card fd-card p-4 mb-4"
-                     style="border-left: 4px solid #dc3545 !important;">
-                    <p class="fd-section-title text-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Important Disclaimer
-                    </p>
-                    <p class="text-muted mb-0" style="font-size:13px;">
-                        This tool provides <strong>risk analysis only</strong> — not a medical diagnosis.
-                        Results are based on statistical patterns. Always consult a qualified physician
-                        for accurate diagnosis and treatment.
-                    </p>
-                </div>
-
             </div>
         </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info mb-5">
+        <i class="fas fa-info-circle me-2"></i>
+        No disease data returned. Please check your disease predictor module.
+    </div>
+    {% endif %}
 
-        <!-- ── SUBMIT ── -->
-        <div class="text-center mt-2 mb-5">
-            <button type="submit" class="btn btn-analyse shadow-lg">
-                <i class="fas fa-microscope me-2"></i>Analyse 64 Diseases Now
-            </button>
-            <p class="text-muted mt-3" style="font-size:12.5px;">
-                <i class="fas fa-lock me-1"></i>Your data is processed locally and not stored for this analysis.
-            </p>
+    <!-- ── BY CATEGORY ── -->
+    {% if by_category %}
+    <p class="section-title"><i class="fas fa-th-large me-2"></i>Risk by Category</p>
+    <div class="row g-3 mb-5">
+        {% for category, diseases in by_category.items() %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card cat-card shadow-sm h-100 p-3">
+                <h6 class="fw-bold text-dark mb-3">
+                    {% if 'Cardio' in category or 'Heart' in category %}
+                        <i class="fas fa-heartbeat text-danger me-2"></i>
+                    {% elif 'Metabol' in category or 'Diabet' in category %}
+                        <i class="fas fa-tint text-warning me-2"></i>
+                    {% elif 'Sleep' in category or 'Neuro' in category %}
+                        <i class="fas fa-bed text-primary me-2"></i>
+                    {% elif 'Mental' in category %}
+                        <i class="fas fa-brain text-success me-2"></i>
+                    {% elif 'Respir' in category or 'Lung' in category %}
+                        <i class="fas fa-lungs text-info me-2"></i>
+                    {% else %}
+                        <i class="fas fa-notes-medical text-secondary me-2"></i>
+                    {% endif %}
+                    {{ category }}
+                </h6>
+                <ul class="list-unstyled mb-0">
+                    {% for d in diseases[:5] %}
+                    {% set dscore = d.score if d.score is defined else d.risk_score if d.risk_score is defined else 0 %}
+                    {% set dname  = d.name  if d.name  is defined else d.disease if d.disease is defined else 'Unknown' %}
+                    <li class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-dark fw-semibold">{{ dname }}</small>
+                        <span class="badge rounded-pill
+                            {% if dscore >= 75 %}badge-critical
+                            {% elif dscore >= 50 %}badge-high
+                            {% elif dscore >= 30 %}badge-medium
+                            {% else %}badge-low{% endif %}"
+                            style="font-size:10px;">
+                            {{ dscore | round(0) | int }}%
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
-    </form>
+    <!-- ── ACTIONS ── -->
+    <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <a href="/find-disease" class="btn btn-outline-primary rounded-pill px-4">
+            <i class="fas fa-redo me-2"></i>Run Again
+        </a>
+        <a href="/symptom-checker" class="btn btn-outline-danger rounded-pill px-4">
+            <i class="fas fa-stethoscope me-2"></i>Symptom Checker
+        </a>
+        <a href="/encyclopedia" class="btn btn-outline-success rounded-pill px-4">
+            <i class="fas fa-book-medical me-2"></i>Learn About Diseases
+        </a>
+        <a href="/dashboard" class="btn btn-primary rounded-pill px-4">
+            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+        </a>
+    </div>
+
 </div>
-
 {% endblock %}

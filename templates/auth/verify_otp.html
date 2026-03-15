@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body { font-family:'Inter',sans-serif !important; }
+.otp-wrap { min-height:80vh; display:flex; align-items:center; justify-content:center; padding:40px 16px; }
+.otp-card {
+    background:white; border-radius:24px; padding:40px 36px;
+    box-shadow:0 8px 40px rgba(0,0,0,0.1); border:1px solid #e2e8f0;
+    max-width:440px; width:100%;
+}
+.otp-icon { width:72px;height:72px;background:linear-gradient(135deg,#7c3aed,#6d28d9);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;box-shadow:0 8px 24px rgba(124,58,237,0.4); }
+.otp-icon i { font-size:1.8rem;color:white; }
+.otp-title { font-size:1.6rem;font-weight:800;text-align:center;color:#0d1b2a;margin-bottom:6px; }
+.otp-sub   { text-align:center;color:#64748b;font-size:14px;margin-bottom:28px; }
+.otp-inputs { display:flex;gap:10px;justify-content:center;margin-bottom:28px; }
+.otp-box {
+    width:52px;height:62px;border:2px solid #e2e8f0;border-radius:14px;
+    text-align:center;font-size:1.5rem;font-weight:700;color:#0d1b2a;
+    font-family:'Inter',sans-serif;background:#f8fafc;
+    transition:border-color 0.2s,box-shadow 0.2s;
+}
+.otp-box:focus { outline:none;border-color:#7c3aed;box-shadow:0 0 0 3px rgba(124,58,237,0.15);background:white; }
+.btn-verify {
+    width:100%;padding:14px;border:none;border-radius:50px;
+    background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;
+    font-weight:700;font-size:1rem;cursor:pointer;
+    box-shadow:0 6px 20px rgba(124,58,237,0.35);transition:transform 0.2s;
+}
+.btn-verify:hover { transform:translateY(-2px); }
+.resend-text { text-align:center;margin-top:16px;font-size:13px;color:#64748b; }
+.resend-text a { color:#7c3aed;font-weight:600;text-decoration:none; }
+</style>
+
+<div class="otp-wrap">
+  <div class="otp-card">
+    <div class="otp-icon"><i class="fas fa-shield-alt"></i></div>
+    <div class="otp-title">Enter Your OTP</div>
+    <div class="otp-sub">We've sent a 6-digit code to your email address. Enter it below to continue.</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} rounded-3 mb-3 py-2">{{ message }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <form method="POST" id="otpForm">
+      <!-- 6 individual boxes for UX, combined into hidden input on submit -->
+      <div class="otp-inputs">
+        {% for i in range(6) %}
+        <input type="text" class="otp-box" id="d{{ i }}" maxlength="1" pattern="[0-9]"
+               inputmode="numeric" autocomplete="off">
+        {% endfor %}
+      </div>
+      <input type="hidden" name="otp" id="otpHidden">
+      <button type="submit" class="btn-verify">
+        <i class="fas fa-check-circle me-2"></i>Verify OTP
+      </button>
+    </form>
+
+    <div class="resend-text">
+      Didn't receive it? <a href="/forgot-password">Resend OTP</a>
+      &nbsp;|&nbsp;
+      <a href="/login">Back to Login</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auto-advance between boxes
+document.querySelectorAll('.otp-box').forEach(function(box, i, boxes) {
+    box.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g,'');
+        if (this.value && i < boxes.length - 1) boxes[i+1].focus();
+    });
+    box.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && !this.value && i > 0) boxes[i-1].focus();
+    });
+    box.addEventListener('paste', function(e) {
+        e.preventDefault();
+        var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'');
+        paste.split('').forEach(function(ch, j) {
+            if (boxes[j]) boxes[j].value = ch;
+        });
+        if (paste.length < boxes.length) boxes[paste.length - 1].focus();
+    });
+});
+
+document.getElementById('otpForm').addEventListener('submit', function() {
+    var code = '';
+    document.querySelectorAll('.otp-box').forEach(function(b){ code += b.value; });
+    document.getElementById('otpHidden').value = code;
+});
+
+// Auto-focus first box
+document.getElementById('d0').focus();
+</script>
+{% endblock %}

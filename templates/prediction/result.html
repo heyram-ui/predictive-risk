@@ -13,12 +13,12 @@
         </div>
     </div>
 
-    <!-- Overall Score -->
+    <!-- Overall Risk -->
     <div class="glass-card text-center mb-5" style="border-left: 10px solid {{ overall_color }}">
-        <h3>Overall Health Score</h3>
+        <h3>Overall Health Risk Level</h3>
         <h1 class="display-1 fw-bold" style="color: {{ overall_color }}">{{ overall_score }}<span
                 class="fs-4 text-muted">/100</span></h1>
-        <p class="lead">{{ overall_status }}</p>
+        <p class="lead fw-bold" style="color:{{ overall_color }}">⚠️ Risk: {{ overall_status }}</p>
 
         <div class="mt-2 mb-3">
             <span class="badge bg-primary me-2"><i class="fas fa-robot me-1"></i>ML Confidence: 98%</span>

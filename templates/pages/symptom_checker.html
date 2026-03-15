@@ -1,101 +1,258 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            
-            <div class="text-center mb-5 fade-in-up">
-                <span class="badge bg-primary-soft text-primary fw-bold mb-2">AI DIAGNOSTICS</span>
-                <h1 class="fw-bold display-5">Symptom Checker</h1>
-                <p class="text-muted">Select all the symptoms you are experiencing to find a match.</p>
-            </div>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body { font-family:'Inter',sans-serif !important; background:#f0f4f8; }
 
-            <form method="POST" class="health-card p-5 mb-5 fade-in-up delay-1">
-                <h5 class="fw-bold mb-4 text-dark border-bottom pb-2">
-                    <i class="fas fa-stethoscope me-2 text-danger"></i>Select Symptoms
-                </h5>
-                
-                <div class="symptom-grid">
-                    {% for symptom in symptoms %}
-                    <div class="symptom-item">
-                        <input type="checkbox" class="btn-check" id="sym_{{loop.index}}" name="symptoms" value="{{symptom}}">
-                        <label class="btn btn-outline-dark symptom-label w-100" for="sym_{{loop.index}}">
-                            {{ symptom }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
+.sc-hero { background:linear-gradient(135deg,#0f172a,#0d6e6e); color:white; padding:60px 0 40px; }
+.sc-hero h1 { font-size:2.2rem; font-weight:900; }
 
-                <div class="text-center mt-5">
-                    <button type="submit" class="btn btn-primary-modern btn-lg shadow-lg px-5 rounded-pill">
-                        <i class="fas fa-search me-2"></i>Analyze Condition
-                    </button>
-                </div>
-            </form>
+.sc-body { padding:45px 0 80px; }
 
-            {% if diagnosis %}
-            <div class="health-card border-success bg-white shadow-lg fade-in-up" style="border-left: 8px solid #10b981;">
-                <div class="p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-success text-white rounded-circle p-3 me-3">
-                            <i class="fas fa-check-circle fa-2x"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-uppercase text-muted fw-bold small mb-1">Diagnosis Result</h6>
-                            <h2 class="fw-bold text-success mb-0">{{ diagnosis.name }}</h2>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-light p-4 rounded-3">
-                        <h5 class="fw-bold mb-3">Recommended Recovery Protocol:</h5>
-                        <div class="row g-3">
-                            {% for phase, action in diagnosis.plan.items() %}
-                            <div class="col-md-4">
-                                <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body">
-                                        <div class="badge bg-dark mb-2">{{ phase }}</div>
-                                        <p class="small text-muted mb-0">{{ action }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
+/* Info bar */
+.info-notice {
+    background:#eff6ff; border:1px solid #bfdbfe; border-radius:14px;
+    padding:14px 18px; font-size:13px; color:#1e40af; margin-bottom:22px;
+    display:flex; align-items:center; gap:10px;
+}
+.err-notice {
+    background:#fef2f2; border:1px solid #fecaca; border-radius:14px;
+    padding:14px 18px; font-size:14px; color:#dc2626; font-weight:600;
+    margin-bottom:22px; display:flex; align-items:center; gap:10px;
+}
 
-                    <div class="mt-4 text-end">
-                        <a href="/tracker" class="btn btn-success rounded-pill fw-bold px-4">
-                            Start Tracking Recovery <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-        </div>
+/* Form card */
+.sc-form-card {
+    background:white; border-radius:22px; padding:32px;
+    box-shadow:0 4px 24px rgba(0,0,0,.07); border:1px solid #e2e8f0;
+}
+.sc-form-card h5 { font-weight:700; color:#0d1b2a; padding-bottom:14px; border-bottom:2px solid #f0f4f8; margin-bottom:20px; }
+
+/* Symptom pills */
+.symptom-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(168px,1fr)); gap:9px; margin-bottom:26px; }
+.sym-label {
+    border-radius:50px !important; font-size:13px; padding:8px 13px !important;
+    background:#f8fafc; border:2px solid #e2e8f0 !important; color:#374151;
+    font-weight:500; cursor:pointer; text-align:center; transition:all .2s;
+    text-transform:capitalize;
+}
+.btn-check:checked + .sym-label {
+    background:linear-gradient(135deg,#0d6e6e,#10b981) !important;
+    border-color:#0d6e6e !important; color:white !important;
+    transform:translateY(-2px); box-shadow:0 4px 14px rgba(13,110,110,.35) !important;
+}
+.sym-label:hover { border-color:#0d6e6e !important; color:#0d6e6e; }
+
+/* Counter */
+.sel-counter {
+    font-size:13px; font-weight:700; color:#0d6e6e;
+    padding:8px 18px; background:#f0fdf4; border-radius:50px;
+    border:1px solid #bbf7d0; display:inline-block; margin-bottom:18px;
+}
+
+.btn-analyse {
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 42px; border-radius:50px; border:none;
+    background:linear-gradient(135deg,#0d6e6e,#10b981);
+    color:white; font-weight:700; font-size:1rem;
+    box-shadow:0 8px 24px rgba(13,110,110,.4); cursor:pointer; transition:transform .2s;
+}
+.btn-analyse:hover { transform:translateY(-3px); }
+
+/* Result cards */
+.result-section { margin-top:36px; }
+.match-card {
+    background:white; border-radius:20px;
+    border-left:6px solid #10b981; box-shadow:0 6px 28px rgba(16,185,129,.12);
+    padding:28px; margin-bottom:18px;
+}
+.match-card.secondary { border-left-color:#f59e0b; }
+.match-badge { display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; }
+.badge-primary { background:linear-gradient(135deg,#059669,#10b981); color:white; border-radius:50px; padding:4px 14px; font-size:12px; font-weight:700; }
+.badge-secondary { background:linear-gradient(135deg,#d97706,#f59e0b); color:white; border-radius:50px; padding:4px 14px; font-size:12px; font-weight:700; }
+.match-title { font-size:1.4rem; font-weight:900; color:#0d1b2a; margin-bottom:4px; }
+.match-pct { font-size:13px; color:#64748b; margin-bottom:16px; }
+
+.sym-matched { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.sym-tag { background:#f0fdf4; color:#15803d; border-radius:50px; padding:4px 12px; font-size:12px; font-weight:600; border:1px solid #bbf7d0; }
+
+.phase-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin-bottom:16px; }
+.phase-item { background:#f8fafc; border-radius:12px; padding:14px; border:1px solid #e2e8f0; }
+.phase-lbl { font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.08em; margin-bottom:5px; }
+.phase-txt { font-size:13px; color:#374151; line-height:1.6; }
+
+.water-rec {
+    background:linear-gradient(135deg,#eff6ff,#dbeafe); border-radius:12px;
+    padding:12px 16px; font-size:13px; color:#1e40af; font-weight:500;
+    display:flex; align-items:center; gap:10px; margin-bottom:16px; border:1px solid #bfdbfe;
+}
+.water-rec i { color:#3b82f6; font-size:1rem; flex-shrink:0; }
+
+.match-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.btn-action {
+    padding:10px 22px; border-radius:50px; font-size:13px; font-weight:700;
+    text-decoration:none; border:none; cursor:pointer; transition:transform .2s;
+}
+.btn-action:hover { transform:translateY(-2px); }
+.btn-green  { background:linear-gradient(135deg,#059669,#10b981); color:white; box-shadow:0 4px 14px rgba(16,185,129,.35); }
+.btn-blue   { background:linear-gradient(135deg,#2563eb,#3b82f6); color:white; box-shadow:0 4px 14px rgba(37,99,235,.3); }
+.btn-outline{ background:white; border:2px solid #e2e8f0; color:#374151; }
+</style>
+
+<div class="sc-hero">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3">
+      <div style="width:52px;height:52px;background:rgba(255,255,255,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+        <i class="fas fa-stethoscope"></i>
+      </div>
+      <div>
+        <h1 class="mb-1">Symptom Checker</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,.7);">Select your symptoms — we'll match them to the top 2 most likely conditions</p>
+      </div>
     </div>
+  </div>
 </div>
 
-<style>
-    .symptom-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Auto-fit columns */
-        gap: 15px;
-    }
-    
-    .symptom-label {
-        border-radius: 50px;
-        font-size: 0.9rem;
-        padding: 10px 15px;
-        transition: all 0.2s;
-        text-transform: capitalize;
-    }
+<div class="sc-body">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
 
-    .btn-check:checked + .symptom-label {
-        background-color: var(--primary);
-        border-color: var(--primary);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
-    }
-</style>
+        <div class="info-notice">
+          <i class="fas fa-info-circle fa-lg"></i>
+          <span><strong>How it works:</strong> Select at least <strong>2 symptoms</strong>. The engine matches them against 7 disease profiles and shows the top 2 most likely conditions with recovery plans.</span>
+        </div>
+
+        {% if error_msg %}
+        <div class="err-notice"><i class="fas fa-exclamation-triangle"></i>{{ error_msg }}</div>
+        {% endif %}
+
+        <!-- Symptom Form -->
+        <form method="POST" class="sc-form-card" id="scForm">
+          <h5><i class="fas fa-list-ul me-2" style="color:#0d6e6e"></i>Select All Symptoms You Are Experiencing</h5>
+
+          <div class="sel-counter" id="counter">0 symptoms selected (minimum 2 needed)</div>
+
+          <div class="symptom-grid">
+            {% for symptom in symptoms %}
+            <div>
+              <input type="checkbox" class="btn-check sym-chk" id="s{{ loop.index }}" name="symptoms" value="{{ symptom }}">
+              <label class="btn sym-label w-100 text-center" for="s{{ loop.index }}">{{ symptom }}</label>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn-analyse">
+              <i class="fas fa-search"></i> Analyse My Symptoms
+            </button>
+          </div>
+        </form>
+
+        <!-- Results -->
+        {% if all_matches %}
+        <div class="result-section">
+          <h4 class="fw-bold mb-3" style="color:#0d1b2a">
+            <i class="fas fa-clipboard-check me-2 text-success"></i>
+            Analysis Results — Top {{ all_matches|length }} Match{% if all_matches|length > 1 %}es{% endif %}
+          </h4>
+
+          {% for match in all_matches %}
+          <div class="match-card {% if loop.index > 1 %}secondary{% endif %}">
+            <div class="match-badge">
+              {% if loop.index == 1 %}
+              <span class="badge-primary"><i class="fas fa-trophy me-1"></i>Best Match</span>
+              {% else %}
+              <span class="badge-secondary"><i class="fas fa-medal me-1"></i>2nd Match</span>
+              {% endif %}
+            </div>
+            <div class="match-title">{{ match.name }}</div>
+            <div class="match-pct">{{ match.match_pct }}% symptom overlap with your selections</div>
+
+            <!-- Matched symptoms -->
+            <div class="fw-bold" style="font-size:13px;color:#374151;margin-bottom:8px;">
+              <i class="fas fa-check-circle me-1 text-success"></i>Matched symptoms:
+            </div>
+            <div class="sym-matched">
+              {% for s in match.matched_symptoms %}
+              <span class="sym-tag">{{ s }}</span>
+              {% endfor %}
+            </div>
+
+            <!-- Water intake recommendation -->
+            <div class="water-rec">
+              <i class="fas fa-tint"></i>
+              <span><strong>Water Intake:</strong> {{ match.water }}</span>
+            </div>
+
+            <!-- 3-phase recovery plan -->
+            {% if match.plan %}
+            <div class="fw-bold" style="font-size:13px;color:#374151;margin-bottom:8px;">
+              <i class="fas fa-calendar-check me-1 text-success"></i>3-Phase Recovery Plan
+            </div>
+            <div class="phase-grid mb-3">
+              {% for phase, action in match.plan.items() %}
+              <div class="phase-item">
+                <div class="phase-lbl">{{ phase }}</div>
+                <div class="phase-txt">{{ action }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Diet tips -->
+            {% if match.recovery and match.recovery.diet %}
+            <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+              <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;min-width:140px">
+                <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:6px">✅ EAT MORE</div>
+                {% for food in match.recovery.diet.good %}<div style="font-size:12px;color:#374151">• {{ food }}</div>{% endfor %}
+              </div>
+              <div style="flex:1;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px;min-width:140px">
+                <div style="font-size:11px;font-weight:700;color:#dc2626;margin-bottom:6px">❌ AVOID</div>
+                {% for food in match.recovery.diet.bad %}<div style="font-size:12px;color:#374151">• {{ food }}</div>{% endfor %}
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Action buttons -->
+            <div class="match-actions">
+              <a href="/tracker" class="btn-action btn-green">
+                <i class="fas fa-calendar-check me-1"></i>Track My Recovery
+              </a>
+              <a href="/encyclopedia" class="btn-action btn-blue">
+                <i class="fas fa-book-medical me-1"></i>Learn More
+              </a>
+              <a href="/assess" class="btn-action btn-outline">
+                <i class="fas fa-heartbeat me-1"></i>Full ML Risk Check
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+
+          <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:14px;padding:14px 18px;font-size:13px;color:#92400e;margin-top:10px;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Disclaimer:</strong> This symptom checker is for awareness only. Always consult a licensed doctor for medical diagnosis and treatment.
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Live counter
+var checks = document.querySelectorAll('.sym-chk');
+var counter = document.getElementById('counter');
+function updateCounter() {
+    var n = document.querySelectorAll('.sym-chk:checked').length;
+    counter.textContent = n + ' symptom' + (n !== 1 ? 's' : '') + ' selected' + (n < 2 ? ' (minimum 2 needed)' : ' — ready to analyse!');
+    counter.style.background = n >= 2 ? '#f0fdf4' : '#fef2f2';
+    counter.style.borderColor = n >= 2 ? '#bbf7d0' : '#fecaca';
+    counter.style.color       = n >= 2 ? '#15803d' : '#dc2626';
+}
+checks.forEach(function(c){ c.addEventListener('change', updateCounter); });
+updateCounter();
+</script>
 {% endblock %}

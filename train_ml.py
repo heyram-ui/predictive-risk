@@ -1,204 +1,283 @@
+"""
+=============================================================================
+PREDICTIVE HEALTH RISK — ML MODEL TRAINER
+=============================================================================
+This script trains a RandomForest classifier on your daily-routine CSVs.
+
+HOW IT FITS INTO THE PROJECT:
+  1. User fills the health assessment form (/assess)
+  2. app.py sends their vitals → health_model.pkl (this model)
+  3. Model predicts disease class → risk score computed → PDF report generated
+
+DATASETS USED:
+  • diabetes_data.csv      — Pima Indians Diabetes Dataset (768 records)
+  • heart_data.csv         — Cardiovascular Disease Dataset (70 000 records)
+  • sleep_data.csv         — Sleep Health & Lifestyle Dataset (374 records)
+  • comprehensive_health_data.csv — Multi-disease routine data (if present)
+
+HOW TO GET MORE DATA:
+  • Kaggle: https://www.kaggle.com/datasets — search "health risk lifestyle"
+  • UCI ML: https://archive.ics.uci.edu
+  • NHANES: https://www.cdc.gov/nchs/nhanes
+  Add new CSVs below following the existing pattern.
+
+TO RETRAIN:
+  python train_ml.py
+=============================================================================
+"""
+
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import classification_report
 import pickle
 import os
 
-print("🔄 Initializing Multi-Disease Training Engine...")
+print("\n" + "="*60)
+print("ML  HEALTH RISK PREDICTION MODEL TRAINER")
+print("="*60)
 
-# Standard Features for the App
-common_columns = ['age', 'bmi', 'sleep_hours', 'activity_mins', 'stress_level', 'bp_sys', 'bp_dias', 'screen_time', 'Diagnosis']
-master_data = pd.DataFrame(columns=common_columns)
+FEATURES = ['age', 'bmi', 'sleep_hours', 'activity_mins',
+            'stress_level', 'bp_sys', 'bp_dias', 'screen_time']
+TARGET   = 'Diagnosis'
 
-# --- 1. LOAD DIABETES DATASET ---
+master = pd.DataFrame(columns=FEATURES + [TARGET])
+
+# -----------------------------------------------------------------
+# 1. DIABETES DATASET
+# -----------------------------------------------------------------
 if os.path.exists('diabetes_data.csv'):
-    print("✅ Loading Diabetes Dataset...")
+    print("\n>> Loading diabetes_data.csv ...")
     try:
-        df_d = pd.read_csv('diabetes_data.csv')
-        
-        # Clean column names (strip spaces)
-        df_d.columns = df_d.columns.str.strip()
-        
-        temp_df = pd.DataFrame()
-        # Handle Capitalization (Age vs age)
-        if 'Age' in df_d.columns: temp_df['age'] = df_d['Age']
-        elif 'age' in df_d.columns: temp_df['age'] = df_d['age']
-        
-        if 'BMI' in df_d.columns: temp_df['bmi'] = df_d['BMI']
-        elif 'bmi' in df_d.columns: temp_df['bmi'] = df_d['bmi']
-        
-        # Glucose & BP
-        if 'Glucose' in df_d.columns: temp_df['glucose'] = df_d['Glucose']
-        if 'BloodPressure' in df_d.columns:
-            temp_df['bp_dias'] = df_d['BloodPressure']
-            temp_df['bp_sys'] = temp_df['bp_dias'] + 40 # Estimate
-            
-        # Fill Defaults
-        temp_df['sleep_hours'] = 7.0
-        temp_df['activity_mins'] = 30
-        temp_df['stress_level'] = 5
-        temp_df['screen_time'] = 6.0
-        
-        # Diagnosis Label
-        if 'Outcome' in df_d.columns:
-            temp_df['Diagnosis'] = df_d['Outcome'].apply(lambda x: 'Diabetes Type 2' if x == 1 else 'Healthy')
-        
-        master_data = pd.concat([master_data, temp_df], ignore_index=True)
-        print(f"   -> Added {len(temp_df)} Diabetes records.")
+        df = pd.read_csv('diabetes_data.csv')
+        df.columns = df.columns.str.strip()
+        tmp = pd.DataFrame()
+        tmp['age']          = df.get('Age',           df.get('age',          30))
+        tmp['bmi']          = df.get('BMI',           df.get('bmi',          25))
+        tmp['bp_dias']      = df.get('BloodPressure', df.get('blood_pressure',80))
+        tmp['bp_sys']       = tmp['bp_dias'] + 40
+        tmp['sleep_hours']  = 7.0
+        tmp['activity_mins']= 30
+        tmp['stress_level'] = 5
+        tmp['screen_time']  = 6.0
+        if 'Outcome' in df.columns:
+            tmp[TARGET] = df['Outcome'].map({1: 'Diabetes Type 2', 0: 'Healthy'})
+        else:
+            tmp[TARGET] = 'Healthy'
+        master = pd.concat([master, tmp[FEATURES + [TARGET]]], ignore_index=True)
+        print(f"   [OK]  {len(tmp):,} records added")
     except Exception as e:
-        print(f"   ⚠️ Error loading Diabetes data: {e}")
+        print(f"   WARNING️  Error: {e}")
 
-# --- 2. LOAD HEART DATASET (The Fix is Here) ---
+# -----------------------------------------------------------------
+# 2. HEART / CARDIOVASCULAR DATASET
+# -----------------------------------------------------------------
 if os.path.exists('heart_data.csv'):
-    print("✅ Loading Heart Dataset...")
+    print("\n>> Loading heart_data.csv ...")
     try:
-        # 1. Try reading with standard comma
-        df_h = pd.read_csv('heart_data.csv')
-        
-        # 2. If 'age' column is missing, try Semicolon separator (Common Kaggle issue)
-        if 'age' not in df_h.columns and 'Age' not in df_h.columns:
-            print("   -> Detected semicolon separator. Reloading...")
-            df_h = pd.read_csv('heart_data.csv', sep=';')
+        df = pd.read_csv('heart_data.csv')
+        if 'age' not in df.columns and 'Age' not in df.columns:
+            df = pd.read_csv('heart_data.csv', sep=';')
+        df.columns = df.columns.str.strip()
+        tmp = pd.DataFrame()
 
-        # Clean column names
-        df_h.columns = df_h.columns.str.strip()
-        
-        temp_df = pd.DataFrame()
-        
-        # Age (Convert days to years if needed)
-        if 'age' in df_h.columns:
-            temp_df['age'] = df_h['age'] // 365 if df_h['age'].mean() > 150 else df_h['age']
-        elif 'Age' in df_h.columns:
-             temp_df['age'] = df_h['Age'] // 365 if df_h['Age'].mean() > 150 else df_h['Age']
-            
-        # BMI Calculation (weight / height^2) if BMI column missing
-        # Many heart datasets have 'weight' (kg) and 'height' (cm)
-        if 'weight' in df_h.columns and 'height' in df_h.columns:
-            # Convert height to meters
-            temp_df['bmi'] = df_h['weight'] / ((df_h['height'] / 100) ** 2)
+        age_col = df.get('age', df.get('Age', None))
+        if age_col is not None:
+            tmp['age'] = age_col // 365 if age_col.mean() > 150 else age_col
         else:
-            temp_df['bmi'] = 28.0 # Default fallback
-            
-        # Blood Pressure
-        if 'ap_hi' in df_h.columns: temp_df['bp_sys'] = df_h['ap_hi']
-        if 'ap_lo' in df_h.columns: temp_df['bp_dias'] = df_h['ap_lo']
-        
-        # Activity
-        if 'active' in df_h.columns:
-            temp_df['activity_mins'] = df_h['active'] * 45
-        else:
-            temp_df['activity_mins'] = 30
-            
-        # Defaults
-        temp_df['sleep_hours'] = 6.5
-        temp_df['stress_level'] = 7
-        temp_df['screen_time'] = 5.0
-        
-        # Diagnosis
-        if 'cardio' in df_h.columns:
-            temp_df['Diagnosis'] = df_h['cardio'].apply(lambda x: 'Heart Disease' if x == 1 else 'Healthy')
-        elif 'target' in df_h.columns:
-            temp_df['Diagnosis'] = df_h['target'].apply(lambda x: 'Heart Disease' if x == 1 else 'Healthy')
+            tmp['age'] = 45
 
-        # Filter meaningful data (remove bad columns)
-        master_data = pd.concat([master_data, temp_df], ignore_index=True)
-        print(f"   -> Added {len(temp_df)} Heart records.")
-        
+        if 'weight' in df.columns and 'height' in df.columns:
+            tmp['bmi'] = df['weight'] / ((df['height'] / 100) ** 2)
+        else:
+            tmp['bmi'] = 28.0
+
+        tmp['bp_sys']        = df.get('ap_hi',    120)
+        tmp['bp_dias']       = df.get('ap_lo',     80)
+        tmp['activity_mins'] = df.get('active', 1).map({1: 45, 0: 10}) if 'active' in df.columns else 30
+        tmp['sleep_hours']   = 6.5
+        tmp['stress_level']  = 7
+        tmp['screen_time']   = 5.0
+
+        if 'cardio' in df.columns:
+            tmp[TARGET] = df['cardio'].map({1: 'Heart Disease', 0: 'Healthy'})
+        elif 'target' in df.columns:
+            tmp[TARGET] = df['target'].map({1: 'Heart Disease', 0: 'Healthy'})
+        else:
+            tmp[TARGET] = 'Healthy'
+
+        # Filter obviously bad BP readings from raw data
+        tmp = tmp[(tmp['bp_sys'].between(60, 250)) & (tmp['bp_dias'].between(40, 160))]
+
+        master = pd.concat([master, tmp[FEATURES + [TARGET]]], ignore_index=True)
+        print(f"   [OK]  {len(tmp):,} records added")
     except Exception as e:
-         print(f"   ⚠️ Error loading Heart data: {e}")
+        print(f"   WARNING️  Error: {e}")
 
-
-# --- 3. LOAD SLEEP DATASET ---
+# -----------------------------------------------------------------
+# 3. SLEEP & LIFESTYLE DATASET
+# -----------------------------------------------------------------
 if os.path.exists('sleep_data.csv'):
-    print("✅ Loading Sleep Dataset...")
+    print("\n>> Loading sleep_data.csv ...")
     try:
-        df_s = pd.read_csv('sleep_data.csv')
-        
-        temp_df = pd.DataFrame()
-        if 'Age' in df_s.columns: temp_df['age'] = df_s['Age']
-        if 'Sleep Duration' in df_s.columns: temp_df['sleep_hours'] = df_s['Sleep Duration']
-        if 'Physical Activity Level' in df_s.columns: temp_df['activity_mins'] = df_s['Physical Activity Level']
-        if 'Stress Level' in df_s.columns: temp_df['stress_level'] = df_s['Stress Level']
-        
-        # BP Split
-        if 'Blood Pressure' in df_s.columns:
+        df = pd.read_csv('sleep_data.csv')
+        tmp = pd.DataFrame()
+        tmp['age']          = df.get('Age', 35)
+        tmp['sleep_hours']  = df.get('Sleep Duration', 7)
+        tmp['activity_mins']= df.get('Physical Activity Level', 30)
+        tmp['stress_level'] = df.get('Stress Level', 5)
+
+        if 'Blood Pressure' in df.columns:
             try:
-                temp_df[['bp_sys', 'bp_dias']] = df_s['Blood Pressure'].str.split('/', expand=True).astype(float)
+                bp = df['Blood Pressure'].str.split('/', expand=True).astype(float)
+                tmp['bp_sys']  = bp[0]
+                tmp['bp_dias'] = bp[1]
             except:
-                temp_df['bp_sys'] = 120
-                temp_df['bp_dias'] = 80
-        
-        # BMI Map
-        bmi_map = {'Normal': 22, 'Overweight': 28, 'Obese': 33, 'Normal Weight': 22}
-        if 'BMI Category' in df_s.columns:
-            temp_df['bmi'] = df_s['BMI Category'].map(bmi_map).fillna(25)
+                tmp['bp_sys'] = 120; tmp['bp_dias'] = 80
         else:
-            temp_df['bmi'] = 25
-            
-        temp_df['screen_time'] = 8.0
-        
-        # Diagnosis
-        if 'Sleep Disorder' in df_s.columns:
-            temp_df['Diagnosis'] = df_s['Sleep Disorder'].apply(lambda x: 'Sleep Insomnia' if str(x) != 'nan' and x != 'None' else 'Healthy')
-            
-        master_data = pd.concat([master_data, temp_df], ignore_index=True)
-        print(f"   -> Added {len(temp_df)} Sleep records.")
+            tmp['bp_sys'] = 120; tmp['bp_dias'] = 80
 
+        bmi_map = {'Normal': 22, 'Normal Weight': 22, 'Overweight': 28, 'Obese': 33}
+        tmp['bmi']         = df['BMI Category'].map(bmi_map).fillna(25) if 'BMI Category' in df.columns else 25
+        tmp['screen_time'] = 8.0
+
+        if 'Sleep Disorder' in df.columns:
+            tmp[TARGET] = df['Sleep Disorder'].apply(
+                lambda x: 'Sleep Insomnia' if str(x).strip() not in ('nan', 'None', '') else 'Healthy'
+            )
+        else:
+            tmp[TARGET] = 'Healthy'
+
+        master = pd.concat([master, tmp[FEATURES + [TARGET]]], ignore_index=True)
+        print(f"   [OK]  {len(tmp):,} records added")
     except Exception as e:
-        print(f"   ⚠️ Error loading Sleep data: {e}")
+        print(f"   WARNING️  Error: {e}")
 
-# --- 4. ROBUST FALLBACK (Synthetic Data) ---
-# If all downloads fail or data is corrupted, we generate data so your project WORKS.
-if len(master_data) < 100:
-    print("⚠️ Real datasets failed or empty. Generating Synthetic Data to save the day...")
-    count = 1000
-    data = {
-        'age': np.random.randint(20, 75, count),
-        'bmi': np.random.uniform(18.0, 38.0, count),
-        'sleep_hours': np.random.uniform(3.5, 10.0, count),
-        'activity_mins': np.random.randint(0, 150, count),
-        'stress_level': np.random.randint(1, 10, count),
-        'bp_sys': np.random.randint(90, 190, count),
-        'bp_dias': np.random.randint(60, 120, count),
-        'screen_time': np.random.uniform(1.0, 14.0, count)
-    }
-    df_syn = pd.DataFrame(data)
-    
-    def synthetic_rules(row):
-        if row['bmi'] > 30 and row['activity_mins'] < 30: return 'Diabetes Type 2'
-        if row['bp_sys'] > 140: return 'Heart Disease'
-        if row['sleep_hours'] < 5.5 and row['stress_level'] > 6: return 'Sleep Insomnia'
+# -----------------------------------------------------------------
+# 4. COMPREHENSIVE HEALTH DATA (if available)
+# -----------------------------------------------------------------
+if os.path.exists('comprehensive_health_data.csv'):
+    print("\n>> Loading comprehensive_health_data.csv ...")
+    try:
+        df = pd.read_csv('comprehensive_health_data.csv')
+        df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
+        tmp = pd.DataFrame()
+        for col in FEATURES:
+            if col in df.columns:
+                tmp[col] = df[col]
+            else:
+                tmp[col] = np.nan
+        if TARGET.lower() in df.columns:
+            tmp[TARGET] = df[TARGET.lower()]
+        elif 'diagnosis' in df.columns:
+            tmp[TARGET] = df['diagnosis']
+        else:
+            tmp[TARGET] = 'Healthy'
+        master = pd.concat([master, tmp[FEATURES + [TARGET]]], ignore_index=True)
+        print(f"   [OK]  {len(tmp):,} records added")
+    except Exception as e:
+        print(f"   WARNING️  Error: {e}")
+
+# -----------------------------------------------------------------
+# 5. SYNTHETIC FALLBACK — 5 disease classes, realistic distributions
+# -----------------------------------------------------------------
+if len(master) < 200:
+    print("\nWARNING️  Not enough real data. Generating 3,000 synthetic records...")
+    n = 3000
+    rng = np.random.default_rng(42)
+
+    syn = pd.DataFrame({
+        'age':           rng.integers(18, 80, n),
+        'bmi':           rng.uniform(16.0, 42.0, n),
+        'sleep_hours':   rng.uniform(3.5, 10.5, n),
+        'activity_mins': rng.integers(0, 180, n),
+        'stress_level':  rng.integers(1, 10, n),
+        'bp_sys':        rng.integers(88, 195, n),
+        'bp_dias':       rng.integers(55, 120, n),
+        'screen_time':   rng.uniform(0.5, 14.0, n),
+    })
+
+    def label_row(r):
+        # Hypertension — high BP
+        if r.bp_sys > 145:
+            return 'Hypertension'
+        # Obesity
+        if r.bmi > 32 and r.activity_mins < 25:
+            return 'Obesity'
+        # Heart Disease — high BP + age + low activity
+        if r.bp_sys > 135 and r.age > 45 and r.activity_mins < 30:
+            return 'Heart Disease'
+        # Diabetes — high BMI + low activity + older
+        if r.bmi > 29 and r.activity_mins < 40 and r.age > 35:
+            return 'Diabetes Type 2'
+        # Insomnia — low sleep + high stress + high screen
+        if r.sleep_hours < 5.5 and r.stress_level > 6 and r.screen_time > 8:
+            return 'Sleep Insomnia'
         return 'Healthy'
-        
-    df_syn['Diagnosis'] = df_syn.apply(synthetic_rules, axis=1)
-    master_data = pd.concat([master_data, df_syn], ignore_index=True)
 
-# Final Cleanup
-master_data = master_data[common_columns].dropna()
+    syn[TARGET] = syn.apply(label_row, axis=1)
+    master = pd.concat([master, syn], ignore_index=True)
+    print(f"   [OK]  Synthetic records generated.")
 
-print(f"📊 Final Training Set: {len(master_data)} records.")
-print(master_data['Diagnosis'].value_counts())
+# -----------------------------------------------------------------
+# CLEAN & PREP
+# -----------------------------------------------------------------
+master = master[FEATURES + [TARGET]].dropna()
+master[FEATURES] = master[FEATURES].apply(pd.to_numeric, errors='coerce')
+master = master.dropna()
 
-# --- TRAINING ---
-print("🧠 Training Unified Model...")
-X = master_data.drop('Diagnosis', axis=1)
-y = master_data['Diagnosis']
+print(f"\n[DATA] Final Dataset: {len(master):,} records")
+print(master[TARGET].value_counts().to_string())
 
+# -----------------------------------------------------------------
+# TRAIN
+# -----------------------------------------------------------------
+print("\n>>> Training RandomForestClassifier ...")
+X = master[FEATURES]
 le = LabelEncoder()
-y_encoded = le.fit_transform(y)
+y = le.fit_transform(master[TARGET])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
+model = RandomForestClassifier(
+    n_estimators=150,
+    max_depth=12,
+    min_samples_leaf=2,
+    class_weight='balanced',   # handles imbalanced classes
+    random_state=42,
+    n_jobs=-1
+)
 model.fit(X_train, y_train)
 
+# -----------------------------------------------------------------
+# EVALUATE
+# -----------------------------------------------------------------
 acc = model.score(X_test, y_test)
-print(f"🎯 Accuracy: {acc*100:.2f}%")
+print(f"\n[TARGET] Test Accuracy:  {acc*100:.2f}%")
 
-artifacts = {'model': model, 'encoder': le}
+cv_scores = cross_val_score(model, X, y, cv=5)
+print(f"[CHART] 5-Fold CV Avg: {cv_scores.mean()*100:.2f}%  (±{cv_scores.std()*100:.2f}%)")
+
+print("\n[REPORT] Classification Report:")
+y_pred = model.predict(X_test)
+print(classification_report(y_test, y_pred, target_names=le.classes_, zero_division=0))
+
+print("\n🔑 Feature Importance (what daily habits matter most for your project):")
+fi = sorted(zip(FEATURES, model.feature_importances_), key=lambda x: -x[1])
+for feat, imp in fi:
+    bar = '█' * int(imp * 50)
+    print(f"   {feat:20s} {bar}  {imp:.3f}")
+
+# -----------------------------------------------------------------
+# SAVE
+# -----------------------------------------------------------------
 with open('health_model.pkl', 'wb') as f:
-    pickle.dump(artifacts, f)
+    pickle.dump({'model': model, 'encoder': le}, f)
 
-print("💾 'health_model.pkl' Updated Successfully!")
+print("\n[OK]  health_model.pkl saved successfully!")
+print("   → app.py will auto-load this on next restart.")
+print("="*60 + "\n")

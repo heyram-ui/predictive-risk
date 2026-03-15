@@ -1,73 +1,738 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row align-items-center min-vh-75">
-    <div class="col-lg-6 animate-in">
-        <h1 class="display-3 fw-bold text-white-shadow mb-4">
-            Predict Health Risks <br>
-            <span style="color: var(--accent);">Before They Happen</span>
-        </h1>
-        <p class="lead text-white mb-5" style="border-left: 4px solid var(--accent); padding-left: 20px;">
-            Advanced Machine Learning analysis of your daily routines to predict 6+ major diseases.
-            Follow WHO standards and get personalized life-saving recommendations.
-        </p>
-        <div class="d-flex gap-3">
-            <a href="/register" class="btn btn-glass btn-lg px-5">Get Started <i
-                    class="fas fa-arrow-right ms-2"></i></a>
-            <a href="/about" class="btn btn-glass btn-lg">Learn More</a>
-        </div>
-    </div>
-    <div class="col-lg-6 animate-in" style="animation-delay: 0.2s;">
-        <div class="glass-card text-center p-5">
-            <i class="fas fa-heart-pulse fa-5x mb-4" style="color: var(--danger);"></i>
-            <h3 class="mb-3">Real-time Analysis</h3>
-            <p>Our algorithms process your vitals and habits instantly to give you a comprehensive health score.</p>
-            <div class="row mt-4">
-                <div class="col-4">
-                    <i class="fas fa-brain fa-2x mb-2 text-primary"></i>
-                    <p class="small">Mental</p>
-                </div>
-                <div class="col-4">
-                    <i class="fas fa-lungs fa-2x mb-2 text-info"></i>
-                    <p class="small">Physical</p>
-                </div>
-                <div class="col-4">
-                    <i class="fas fa-bed fa-2x mb-2 text-warning"></i>
-                    <p class="small">Sleep</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Features Section -->
-<div class="row g-4 mt-5">
-    <div class="col-md-4 animate-in" style="animation-delay: 0.4s;">
-        <div class="glass-card h-100 text-center">
-            <div class="rounded-circle bg-white d-inline-flex p-3 mb-3 text-primary">
-                <i class="fas fa-chart-pie fa-2x"></i>
+<!-- ═══════════════════════════════════════════════════════════
+     HERO SECTION — Full screen animated gradient
+═══════════════════════════════════════════════════════════ -->
+<section class="hero-section">
+    <!-- Floating background orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Floating health icons -->
+    <div class="float-icon" style="top:12%; left:6%; animation-delay:0s;">❤️</div>
+    <div class="float-icon" style="top:20%; right:8%; animation-delay:1.2s;">🧠</div>
+    <div class="float-icon" style="bottom:28%; left:4%; animation-delay:0.6s;">🫀</div>
+    <div class="float-icon" style="bottom:20%; right:5%; animation-delay:1.8s;">💊</div>
+    <div class="float-icon" style="top:50%; left:2%; animation-delay:0.9s; font-size:1.3rem;">🩺</div>
+    <div class="float-icon" style="top:38%; right:3%; animation-delay:2.4s; font-size:1.2rem;">🧬</div>
+
+    <div class="container hero-content">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 hero-text">
+                <div class="hero-badge mb-4">
+                    <span class="badge-dot"></span>
+                    <span>ML-Powered &nbsp;•&nbsp; WHO Certified Standards</span>
+                </div>
+                <h1 class="hero-headline">
+                    Predict Health Risks<br>
+                    <span class="hero-highlight">Before They Happen</span>
+                </h1>
+                <p class="hero-subtext">
+                    Advanced Machine Learning analyzes your daily routine — sleep, activity,
+                    stress, nutrition — to identify risks for <strong>6+ major diseases</strong>
+                    and deliver life-saving, personalized recommendations.
+                </p>
+                <div class="hero-actions">
+                    <a href="/register" class="btn-hero-primary">
+                        <i class="fas fa-heartbeat me-2"></i>Start Free Health Check
+                    </a>
+                    <a href="/login" class="btn-hero-outline">
+                        <i class="fas fa-sign-in-alt me-2"></i>Already a member
+                    </a>
+                </div>
             </div>
-            <h4>Pre-Diagnosis</h4>
-            <p>Identify risks for Diabetes, Hypertension, and Heart Disease early.</p>
+
+            <div class="col-lg-6">
+                <div class="hero-card-container">
+                    <!-- Main Score Card -->
+                    <div class="hero-main-card">
+                        <div class="hc-header">
+                            <div class="hc-pulse"></div>
+                            <span>Live Health Analysis</span>
+                        </div>
+
+                        <div class="hc-score-ring">
+                            <svg viewBox="0 0 120 120" width="120" height="120">
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#34d399" stroke-width="8"
+                                        stroke-dasharray="220 314" stroke-linecap="round"
+                                        transform="rotate(-90 60 60)" class="score-arc"/>
+                            </svg>
+                            <div class="hc-score-inner">
+                                <span class="score-num">72</span>
+                                <span class="score-label">Good</span>
+                            </div>
+                        </div>
+
+                        <div class="hc-risks">
+                            <div class="risk-pill low">💚 Sleep: Normal</div>
+                            <div class="risk-pill medium">🟡 BP: Elevated</div>
+                            <div class="risk-pill low">💚 BMI: Normal</div>
+                        </div>
+                        <p class="hc-hint">Fill in your daily routine → get your real score</p>
+                    </div>
+
+                    <!-- Floating mini cards -->
+                    <div class="mini-card mc-left">
+                        <i class="fas fa-brain"></i>
+                        <span>Mental Score<br><b>88%</b></span>
+                    </div>
+                    <div class="mini-card mc-right">
+                        <i class="fas fa-running"></i>
+                        <span>Activity<br><b>Active</b></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-4 animate-in" style="animation-delay: 0.6s;">
-        <div class="glass-card h-100 text-center">
-            <div class="rounded-circle bg-white d-inline-flex p-3 mb-3 text-success">
-                <i class="fas fa-apple-alt fa-2x"></i>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATS BAR
+═══════════════════════════════════════════════════════════ -->
+<section class="stats-bar">
+    <div class="container">
+        <div class="row g-0 stats-row">
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" data-target="64">0</div>
+                <div class="stat-label">Diseases Analysed</div>
             </div>
-            <h4>WHO Guidelines</h4>
-            <p>Diet and exercise plans strictly based on World Health Organization standards.</p>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" data-target="98">0</div>
+                <div class="stat-label">ML Accuracy %</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" data-target="3">0</div>
+                <div class="stat-label">Real Datasets</div>
+            </div>
+            <div class="col-6 col-md-3 stat-item">
+                <div class="stat-number" data-target="100">0</div>
+                <div class="stat-label">% Data Private</div>
+            </div>
         </div>
     </div>
-    <div class="col-md-4 animate-in" style="animation-delay: 0.8s;">
-        <div class="glass-card h-100 text-center">
-            <div class="rounded-circle bg-white d-inline-flex p-3 mb-3 text-warning">
-                <i class="fas fa-exclamation-triangle fa-2x"></i>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOW IT WORKS — 3 steps
+═══════════════════════════════════════════════════════════ -->
+<section class="how-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Simple Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-sub">Three steps to your complete health intelligence report</p>
+        </div>
+
+        <div class="row g-4 how-steps">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-num">01</div>
+                    <div class="step-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h4>Share Your Routine</h4>
+                    <p>Enter your daily habits — sleep duration, physical activity, stress level, screen time, and basic vitals like BMI and blood pressure.</p>
+                    <div class="step-connector"></div>
+                </div>
             </div>
-            <h4>Emergency Protocol</h4>
-            <p>Instant alerts and hospital admission suggestions for high-risk profiles.</p>
+            <div class="col-md-4">
+                <div class="step-card step-card-mid">
+                    <div class="step-num">02</div>
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <h4>ML Analyses Your Data</h4>
+                    <p>Our RandomForest model — trained on 70,000+ real medical records — predicts your risk for Heart Disease, Diabetes, Insomnia, Hypertension, and more.</p>
+                    <div class="step-connector"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-num">03</div>
+                    <div class="step-icon"><i class="fas fa-file-medical"></i></div>
+                    <h4>Get Your Health Report</h4>
+                    <p>Receive a detailed risk score, disease predictions, personalized lifestyle recommendations, and a downloadable PDF health report.</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FEATURES GRID
+═══════════════════════════════════════════════════════════ -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Everything You Need</span>
+            <h2 class="section-title">All-in-One Health Platform</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <a href="/assess" class="feature-card fc-primary">
+                    <div class="fc-icon"><i class="fas fa-heartbeat"></i></div>
+                    <h4>AI Risk Assessment</h4>
+                    <p>Enter your daily routine and get an instant ML-powered risk score covering 6 major disease categories.</p>
+                    <div class="fc-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/find-disease" class="feature-card fc-purple">
+                    <div class="fc-icon"><i class="fas fa-microscope"></i></div>
+                    <h4>64-Disease Analyser</h4>
+                    <p>Enter your symptoms and vitals to get ranked predictions across 64 conditions — from common colds to chronic disease.</p>
+                    <div class="fc-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/symptom-checker" class="feature-card fc-teal">
+                    <div class="fc-icon"><i class="fas fa-stethoscope"></i></div>
+                    <h4>Symptom Checker</h4>
+                    <p>Select symptoms you're experiencing and our engine instantly matches them to likely conditions with recovery plans.</p>
+                    <div class="fc-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/tracker" class="feature-card fc-green">
+                    <div class="fc-icon"><i class="fas fa-calendar-check"></i></div>
+                    <h4>Daily Health Tracker</h4>
+                    <p>Log your daily diet quality, exercise, and symptom severity. Visualize your 7-day progress chart.</p>
+                    <div class="fc-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/nearby" class="feature-card fc-blue">
+                    <div class="fc-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <h4>Nearby Hospitals</h4>
+                    <p>Locate hospitals and pharmacies near you using Google Maps. View ratings, hours, and directions.</p>
+                    <div class="fc-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <a href="/download_report" class="feature-card fc-orange">
+                    <div class="fc-icon"><i class="fas fa-file-pdf"></i></div>
+                    <h4>PDF Health Report</h4>
+                    <p>Download your complete health assessment as a branded PDF — perfect for sharing with your doctor.</p>
+                    <div class="fc-arrow"><i class="fas fa-arrow-right"></i></div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DISEASE COVERAGE STRIP
+═══════════════════════════════════════════════════════════ -->
+<section class="disease-strip">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Disease Coverage</span>
+            <h2 class="section-title">Detects the Conditions That Matter Most</h2>
+        </div>
+        <div class="disease-grid">
+            <div class="disease-chip"><i class="fas fa-heartbeat"></i> Heart Disease</div>
+            <div class="disease-chip"><i class="fas fa-tint"></i> Diabetes Type 2</div>
+            <div class="disease-chip"><i class="fas fa-tachometer-alt"></i> Hypertension</div>
+            <div class="disease-chip"><i class="fas fa-bed"></i> Sleep Insomnia</div>
+            <div class="disease-chip"><i class="fas fa-weight"></i> Obesity</div>
+            <div class="disease-chip"><i class="fas fa-brain"></i> Mental Health</div>
+            <div class="disease-chip"><i class="fas fa-lungs"></i> Respiratory</div>
+            <div class="disease-chip"><i class="fas fa-bone"></i> Arthritis</div>
+            <div class="disease-chip dc-more">+56 More →</div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CTA SECTION
+═══════════════════════════════════════════════════════════ -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <div class="cta-glow"></div>
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
+                    <h2 class="cta-title">Your Health Intelligence Report Is <span>Free</span></h2>
+                    <p class="cta-sub">No wearable. No clinic visit. Just your daily routine data — and our ML does the rest. Takes less than 3 minutes.</p>
+                    <ul class="cta-checks">
+                        <li><i class="fas fa-check-circle"></i> No medical device needed</li>
+                        <li><i class="fas fa-check-circle"></i> WHO-standard guidelines</li>
+                        <li><i class="fas fa-check-circle"></i> 100% private — data stays local</li>
+                        <li><i class="fas fa-check-circle"></i> Downloadable PDF report</li>
+                    </ul>
+                </div>
+                <div class="col-lg-5 text-center">
+                    <a href="/register" class="btn-cta-main">
+                        <i class="fas fa-rocket me-2"></i>Get Started Free
+                    </a>
+                    <p class="cta-small mt-3">Already have an account? <a href="/login">Log in →</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOME PAGE STYLES
+═══════════════════════════════════════════════════════════ -->
+<style>
+/* ── IMPORTS & RESET ─────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+body { font-family: 'Inter', sans-serif !important; }
+
+/* ── HERO ────────────────────────────────────── */
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0e1a 0%, #0d2137 35%, #0d6e6e 70%, #0a1628 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 80px 0;
+}
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float 8s ease-in-out infinite;
+}
+.orb-1 { width:500px; height:500px; background:rgba(13,110,110,0.25); top:-10%; left:-10%; animation-delay:0s; }
+.orb-2 { width:350px; height:350px; background:rgba(79,70,229,0.2);   bottom:-5%; right:-5%; animation-delay:2s; }
+.orb-3 { width:250px; height:250px; background:rgba(52,211,153,0.15); top:40%;   right:20%; animation-delay:4s; }
+
+@keyframes float {
+    0%,100% { transform: translate(0,0); }
+    50%      { transform: translate(20px, -20px); }
+}
+
+.float-icon {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.2;
+    animation: floatIcon 6s ease-in-out infinite;
+    user-select: none;
+    pointer-events: none;
+}
+@keyframes floatIcon {
+    0%,100% { transform: translateY(0) rotate(0deg); opacity:0.2; }
+    50%      { transform: translateY(-18px) rotate(8deg); opacity:0.35; }
+}
+
+.hero-content { position: relative; z-index: 10; }
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.85);
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+.badge-dot {
+    width:8px; height:8px;
+    background:#34d399;
+    border-radius:50%;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
+    50%      { box-shadow: 0 0 0 6px rgba(52,211,153,0);  }
+}
+
+.hero-headline {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+}
+.hero-highlight {
+    background: linear-gradient(90deg, #34d399, #06b6d4, #34d399);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer { 0%{background-position:0%}100%{background-position:200%} }
+
+.hero-subtext {
+    color: rgba(255,255,255,0.7);
+    font-size: 1.1rem;
+    line-height: 1.75;
+    margin-bottom: 36px;
+    max-width: 520px;
+}
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #34d399, #10b981);
+    color: #fff;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: transform 0.25s, box-shadow 0.25s;
+    box-shadow: 0 8px 32px rgba(52,211,153,0.35);
+}
+.btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(52,211,153,0.5); color:#fff; }
+
+.btn-hero-outline {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    backdrop-filter: blur(8px);
+    transition: background 0.25s;
+}
+.btn-hero-outline:hover { background: rgba(255,255,255,0.14); color:#fff; }
+
+/* ── HERO CARD ─────────────────────────────── */
+.hero-card-container { position: relative; padding: 40px 20px; }
+.hero-main-card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 30px;
+    color: white;
+    text-align: center;
+    animation: cardFloat 5s ease-in-out infinite;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+}
+@keyframes cardFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+}
+.hc-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+.hc-pulse {
+    width:8px; height:8px;
+    background:#ef4444;
+    border-radius:50%;
+    animation: pulse 1.5s infinite;
+}
+.hc-score-ring {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+.hc-score-inner {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+}
+.score-num { display:block; font-size:2rem; font-weight:800; line-height:1; }
+.score-label { font-size:12px; opacity:0.7; }
+.score-arc { transition: stroke-dasharray 1.5s ease; }
+
+.hc-risks { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:16px; }
+.risk-pill {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.risk-pill.low    { background:rgba(52,211,153,0.2); border:1px solid rgba(52,211,153,0.4); }
+.risk-pill.medium { background:rgba(251,191,36,0.2); border:1px solid rgba(251,191,36,0.4); }
+.risk-pill.high   { background:rgba(239,68,68,0.2);  border:1px solid rgba(239,68,68,0.4);  }
+
+.hc-hint { font-size:12px; opacity:0.45; margin:0; }
+
+.mini-card {
+    position: absolute;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 12px 16px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+    animation: cardFloat 6s ease-in-out infinite;
+}
+.mini-card i { font-size: 1.1rem; color: #34d399; }
+.mc-left  { left: -20px; bottom: 60px; animation-delay: 1s; }
+.mc-right { right: -20px; top: 60px; animation-delay: 2s; }
+
+/* ── STATS BAR ─────────────────────────────── */
+.stats-bar {
+    background: linear-gradient(135deg, #0d2137, #0d6e6e);
+    padding: 40px 0;
+}
+.stats-row { border-radius: 16px; overflow: hidden; }
+.stat-item {
+    text-align: center;
+    padding: 24px 16px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+.stat-item:last-child { border-right: none; }
+.stat-number {
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #34d399;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+.stat-label { color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 500; }
+
+/* ── SECTION HEADERS ───────────────────────── */
+.section-header { text-align:center; margin-bottom:52px; }
+.section-tag {
+    display: inline-block;
+    background: linear-gradient(90deg, rgba(13,110,110,0.12), rgba(52,211,153,0.12));
+    color: #0d6e6e;
+    border: 1px solid rgba(13,110,110,0.25);
+    padding: 5px 18px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+}
+.section-title {
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    font-weight: 800;
+    color: #0d1b2a;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+}
+.section-sub { color: #64748b; font-size: 1.05rem; max-width: 520px; margin: 0 auto; }
+
+/* ── HOW IT WORKS ──────────────────────────── */
+.how-section { padding: 100px 0; background: #f8fafc; }
+.step-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 38px 30px;
+    height: 100%;
+    position: relative;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.step-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
+.step-card-mid { border: 2px solid #0d6e6e; background: linear-gradient(135deg, #f0fdfa, #fff); }
+.step-num {
+    font-size: 3rem;
+    font-weight: 900;
+    color: rgba(13,110,110,0.12);
+    line-height: 1;
+    margin-bottom: 12px;
+}
+.step-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #0d6e6e, #34d399);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 1.3rem;
+}
+.step-card h4 { font-weight: 700; color: #0d1b2a; margin-bottom: 12px; }
+.step-card p  { color: #64748b; font-size: 0.95rem; line-height: 1.7; margin: 0; }
+.step-connector {
+    position: absolute;
+    right: -22px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 2px;
+    background: linear-gradient(90deg, #0d6e6e, #34d399);
+    z-index: 10;
+}
+.step-connector::after {
+    content: '›';
+    position: absolute;
+    right: -10px;
+    top: -12px;
+    color: #0d6e6e;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+/* ── FEATURES ──────────────────────────────── */
+.features-section { padding: 100px 0; background: #fff; }
+.feature-card {
+    display: block;
+    border-radius: 20px;
+    padding: 36px 28px;
+    height: 100%;
+    text-decoration: none;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.feature-card::before {
+    content:'';
+    position:absolute;
+    top:-50%; left:-50%;
+    width:200%; height:200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 60%);
+    transition: opacity 0.3s;
+    opacity: 0;
+}
+.feature-card:hover::before { opacity:1; }
+.feature-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.2); color:white; }
+
+.fc-primary { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.fc-purple  { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+.fc-teal    { background: linear-gradient(135deg, #0d6e6e, #0891b2); }
+.fc-green   { background: linear-gradient(135deg, #059669, #10b981); }
+.fc-blue    { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.fc-orange  { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+.fc-icon {
+    width:54px; height:54px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+}
+.feature-card h4 { font-weight: 700; margin-bottom: 10px; font-size: 1.1rem; }
+.feature-card p  { font-size: 0.9rem; opacity: 0.85; line-height: 1.65; margin-bottom: 20px; }
+.fc-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width:32px; height:32px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    font-size: 14px;
+    transition: transform 0.25s;
+}
+.feature-card:hover .fc-arrow { transform: translateX(4px); }
+
+/* ── DISEASE STRIP ─────────────────────────── */
+.disease-strip { padding: 80px 0; background: #f0fdfa; }
+.disease-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+.disease-chip {
+    padding: 10px 22px;
+    background: white;
+    border: 1px solid #d1fae5;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #0d6e6e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.disease-chip:hover { background: #0d6e6e; color: white; border-color: #0d6e6e; transform: translateY(-2px); }
+.dc-more { background: #0d6e6e; color: white; border-color: #0d6e6e; font-style: italic; }
+
+/* ── CTA ───────────────────────────────────── */
+.cta-section { padding: 100px 0; background: #0a0e1a; }
+.cta-card {
+    background: linear-gradient(135deg, rgba(13,110,110,0.3), rgba(79,70,229,0.2));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 28px;
+    padding: 60px 50px;
+    position: relative;
+    overflow: hidden;
+}
+.cta-glow {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(52,211,153,0.15), transparent 70%);
+    top: -100px; right: -100px;
+    border-radius: 50%;
+}
+.cta-title { font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; color: white; margin-bottom: 14px; }
+.cta-title span { color: #34d399; }
+.cta-sub { color: rgba(255,255,255,0.65); font-size: 1rem; line-height: 1.7; margin-bottom: 24px; }
+.cta-checks { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.cta-checks li { color: rgba(255,255,255,0.8); font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.cta-checks i { color: #34d399; }
+.btn-cta-main {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 44px;
+    background: linear-gradient(135deg, #34d399, #10b981);
+    color: white;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(52,211,153,0.4);
+    transition: transform 0.25s, box-shadow 0.25s;
+    width: 100%;
+    max-width: 300px;
+}
+.btn-cta-main:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(52,211,153,0.55); color:white; }
+.cta-small { color: rgba(255,255,255,0.45); font-size: 14px; }
+.cta-small a { color: #34d399; text-decoration: none; font-weight: 600; }
+
+/* ── RESPONSIVE ────────────────────────────── */
+@media (max-width: 768px) {
+    .hero-section { padding: 100px 0 60px; }
+    .mc-left, .mc-right { display: none; }
+    .step-connector { display: none; }
+    .cta-card { padding: 36px 24px; }
+    .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+}
+</style>
+
+<!-- COUNTER ANIMATION SCRIPT -->
+<script>
+const observerOpts = { threshold: 0.5 };
+const nums = document.querySelectorAll('.stat-number');
+const animate = (el) => {
+    const target = +el.dataset.target;
+    let current = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { el.textContent = target + (target === 100 ? '%' : '+'); clearInterval(timer); }
+        else el.textContent = Math.floor(current) + (target === 100 ? '%' : '+');
+    }, 25);
+};
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { animate(e.target); observer.unobserve(e.target); } });
+}, observerOpts);
+nums.forEach(n => observer.observe(n));
+</script>
+
 {% endblock %}

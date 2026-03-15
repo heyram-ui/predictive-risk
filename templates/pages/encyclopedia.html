@@ -1,71 +1,131 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container py-5">
-    <div class="text-center mb-5 fade-in-up">
-        <h6 class="text-primary fw-bold text-uppercase">Medical Database</h6>
-        <h1 class="fw-bold display-5">Health Encyclopedia</h1>
-        <p class="text-muted">Explore symptoms, risks, and recovery plans.</p>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body { font-family:'Inter',sans-serif !important; background:#f0f4f8; }
+
+.enc-hero {
+    background: linear-gradient(135deg,#0a0e1a,#0d2137,#0d6e6e);
+    color:white; padding:65px 0 45px;
+}
+.enc-hero h1 { font-size:2.3rem; font-weight:900; }
+
+.enc-body { padding:50px 0 80px; }
+
+.enc-card {
+    background:white; border-radius:22px; padding:28px 24px;
+    border:1px solid #e2e8f0; box-shadow:0 2px 12px rgba(0,0,0,0.05);
+    height:100%; transition:transform 0.25s, box-shadow 0.25s;
+    cursor:pointer; position:relative; overflow:hidden;
+}
+.enc-card:hover { transform:translateY(-5px); box-shadow:0 16px 40px rgba(0,0,0,0.1); }
+
+.enc-card-accent { position:absolute; top:0; left:0; right:0; height:5px; border-radius:22px 22px 0 0; }
+.ac-warning { background:linear-gradient(90deg,#f59e0b,#d97706); }
+.ac-danger  { background:linear-gradient(90deg,#ef4444,#dc2626); }
+.ac-primary { background:linear-gradient(90deg,#3b82f6,#2563eb); }
+.ac-info    { background:linear-gradient(90deg,#06b6d4,#0891b2); }
+.ac-success { background:linear-gradient(90deg,#10b981,#059669); }
+.ac-teal    { background:linear-gradient(90deg,#0d6e6e,#0891b2); }
+.ac-purple  { background:linear-gradient(90deg,#7c3aed,#6d28d9); }
+
+.enc-icon { font-size:2rem; margin-bottom:16px; }
+.enc-card h5 { font-weight:800; font-size:17px; color:#0d1b2a; margin-bottom:10px; }
+.enc-card p  { font-size:13.5px; color:#64748b; line-height:1.65; margin-bottom:14px; }
+
+.symptom-pills { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.sym-pill { background:#f0f4f8; color:#374151; border-radius:50px; padding:4px 12px; font-size:12px; font-weight:500; }
+
+.plan-strip { background:#f8fafc; border-radius:12px; padding:12px 14px; }
+.plan-strip small { font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; }
+.plan-strip p { font-size:13px; color:#374151; margin:4px 0 0; }
+
+.diet-row { display:flex; gap:10px; margin-top:10px; }
+.diet-good, .diet-bad { border-radius:12px; padding:10px 12px; font-size:12px; flex:1; }
+.diet-good { background:#f0fdf4; border:1px solid #bbf7d0; color:#15803d; }
+.diet-bad  { background:#fef2f2; border:1px solid #fecaca; color:#dc2626; }
+.diet-good strong, .diet-bad strong { display:block; font-size:11px; margin-bottom:4px; }
+</style>
+
+<div class="enc-hero">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3">
+      <div style="width:52px;height:52px;background:rgba(255,255,255,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+        <i class="fas fa-book-medical"></i>
+      </div>
+      <div>
+        <h1 class="mb-1">Disease Encyclopedia</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,0.7);">7 major conditions — symptoms, struggles, recovery plans, and diet guides</p>
+      </div>
     </div>
-
-    <div class="row g-4">
-        {% for name, data in diseases.items() %}
-        <div class="col-md-6 col-lg-4 fade-in-up delay-1">
-            <div class="health-card h-100 hover-card">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-{{ data.color }}-soft text-{{ data.color }} rounded-circle p-3 me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas {{ data.icon }} fa-lg"></i>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-0">{{ data.title }}</h5>
-                        <small class="text-muted">Medical Condition</small>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <strong class="text-dark d-block mb-2">⚠️ Common Symptoms:</strong>
-                    <div class="d-flex flex-wrap gap-2">
-                        {% for symptom in data.symptoms %}
-                            <span class="badge bg-light text-dark border">{{ symptom }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <strong class="text-dark d-block mb-1">🛑 The Struggle:</strong>
-                    <p class="small text-muted mb-0">{{ data.struggle }}</p>
-                </div>
-
-                <button class="btn btn-outline-{{ data.color }} btn-sm w-100 rounded-pill mt-auto" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
-                    View Recovery Plan <i class="fas fa-chevron-down ms-1"></i>
-                </button>
-
-                <div class="collapse mt-3" id="collapse{{ loop.index }}">
-                    <div class="card card-body bg-light border-0 small">
-                        <h6 class="fw-bold text-primary"><i class="fas fa-pray me-2"></i>Yoga Therapy</h6>
-                        <ul class="ps-3 mb-2">
-                            {% for yoga in data.recovery.yoga %}
-                                <li>{{ yoga.name }}</li>
-                            {% endfor %}
-                        </ul>
-
-                        <h6 class="fw-bold text-success mt-2"><i class="fas fa-carrot me-2"></i>Diet Plan</h6>
-                        <div>
-                            {% for food in data.recovery.diet.good %}
-                                <span class="badge bg-success-soft text-success border border-success mb-1">{{ food }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+  </div>
 </div>
 
-<style>
-    .bg-danger-soft { background: #fee2e2; color: #b91c1c; }
-    .bg-warning-soft { background: #fef3c7; color: #b45309; }
-    .bg-primary-soft { background: #e0e7ff; color: #4338ca; }
-</style>
+<div class="enc-body">
+  <div class="container">
+
+    <div class="row g-4">
+      {% for key, data in diseases.items() %}
+      <div class="col-lg-6">
+        <div class="enc-card">
+          <div class="enc-card-accent ac-{{ data.color }}"></div>
+
+          <div class="d-flex align-items-start gap-3 mt-2">
+            <i class="fas {{ data.icon }} enc-icon text-{{ data.color }}"></i>
+            <div style="flex:1">
+              <h5>{{ data.title }}</h5>
+
+              <!-- Symptoms -->
+              <div class="symptom-pills">
+                {% for sym in data.symptoms %}
+                <span class="sym-pill"><i class="fas fa-circle me-1" style="font-size:7px;color:#94a3b8"></i>{{ sym }}</span>
+                {% endfor %}
+              </div>
+
+              <p><strong style="color:#374151">What it feels like:</strong> {{ data.struggle }}</p>
+
+              <!-- Recovery Plan -->
+              {% if data.daily_plan %}
+              <div class="plan-strip mb-2">
+                <small>3-Phase Recovery Plan</small>
+                {% for phase, action in data.daily_plan.items() %}
+                <p>📌 <strong>{{ phase }}:</strong> {{ action }}</p>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <!-- Diet -->
+              {% if data.recovery and data.recovery.diet %}
+              <div class="diet-row">
+                <div class="diet-good">
+                  <strong>✅ Eat</strong>
+                  {{ data.recovery.diet.good | join(', ') }}
+                </div>
+                <div class="diet-bad">
+                  <strong>❌ Avoid</strong>
+                  {{ data.recovery.diet.bad | join(', ') }}
+                </div>
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="/symptom-checker" class="btn btn-lg rounded-pill px-5 fw-bold text-white me-3"
+         style="background:linear-gradient(135deg,#0d6e6e,#10b981);box-shadow:0 8px 24px rgba(13,110,110,0.35);">
+        <i class="fas fa-stethoscope me-2"></i>Check My Symptoms
+      </a>
+      <a href="/assess" class="btn btn-lg rounded-pill px-5 fw-bold text-white"
+         style="background:linear-gradient(135deg,#7c3aed,#6d28d9);box-shadow:0 8px 24px rgba(124,58,237,0.35);">
+        <i class="fas fa-heartbeat me-2"></i>Run ML Risk Check
+      </a>
+    </div>
+
+  </div>
+</div>
 {% endblock %}

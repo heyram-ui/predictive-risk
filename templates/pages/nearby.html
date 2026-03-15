@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body { font-family:'Inter',sans-serif !important; background:#f0f4f8; }
+.nearby-wrap { padding: 36px 0 70px; }
+
+/* Header */
+.nb-header { display:flex; align-items:center; gap:16px; margin-bottom:28px; }
+.nb-icon { width:52px;height:52px;background:linear-gradient(135deg,#2563eb,#3b82f6);border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;box-shadow:0 4px 16px rgba(37,99,235,.35); }
+.nb-header h2 { font-size:1.7rem;font-weight:900;color:#0d1b2a;margin:0; }
+.nb-header p  { color:#64748b;margin:0;font-size:14px; }
+
+/* Search card */
+.search-card { background:white;border-radius:20px;padding:22px 26px;box-shadow:0 2px 14px rgba(0,0,0,.07);border:1px solid #e2e8f0;margin-bottom:22px; }
+.sf-row { display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end; }
+.sf-group { flex:1;min-width:130px; }
+.sf-label { font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px; }
+.sf-select { border:2px solid #e8ecf0;border-radius:12px;padding:9px 13px;width:100%;font-family:'Inter',sans-serif;font-size:14px;background:#f8fafc; }
+.btn-loc { padding:10px 18px;border:2px solid #e8ecf0;border-radius:50px;background:white;font-weight:600;font-size:13px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s; }
+.btn-loc:hover { border-color:#2563eb;color:#2563eb; }
+.btn-loc.located { border-color:#10b981;color:#10b981;background:#f0fdf4; }
+.btn-search { padding:10px 26px;border:none;border-radius:50px;background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;font-weight:700;font-size:14px;box-shadow:0 4px 16px rgba(37,99,235,.35);cursor:pointer;display:flex;align-items:center;gap:7px;transition:transform .2s; }
+.btn-search:hover { transform:translateY(-2px); }
+
+/* Layout */
+.map-layout { display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start; }
+@media(max-width:900px){.map-layout{grid-template-columns:1fr;}}
+
+/* Map */
+#mapFrame { width:100%;height:540px;border-radius:20px;border:1px solid #e2e8f0;box-shadow:0 4px 20px rgba(0,0,0,.1); }
+.map-placeholder { width:100%;height:540px;border-radius:20px;border:2px dashed #bfdbfe;background:linear-gradient(135deg,#eff6ff,#f0f4f8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#94a3b8; }
+.map-placeholder i { font-size:2.8rem;color:#bfdbfe; }
+.map-placeholder p { text-align:center;max-width:240px;font-size:14px; }
+
+/* Results */
+.results-scroll { max-height:540px;overflow-y:auto;padding-right:4px; }
+.results-scroll::-webkit-scrollbar { width:5px; }
+.results-scroll::-webkit-scrollbar-thumb { background:#e2e8f0;border-radius:3px; }
+.sec-head { font-weight:800;font-size:14px;color:#0d1b2a;margin-bottom:10px;display:flex;align-items:center;gap:8px; }
+.res-count { background:#f1f5f9;color:#64748b;border-radius:50px;padding:2px 10px;font-size:12px;font-weight:600; }
+
+/* Place card */
+.place-card { background:white;border-radius:16px;padding:15px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:10px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px; }
+.place-card:hover { border-color:#2563eb;box-shadow:0 4px 16px rgba(37,99,235,.15); }
+.pl-icon { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0; }
+.pi-h { background:rgba(239,68,68,.1);color:#ef4444; }
+.pi-p { background:rgba(16,185,129,.1);color:#10b981; }
+.pl-name { font-weight:700;font-size:13px;color:#0d1b2a;margin-bottom:2px; }
+.pl-addr { font-size:11px;color:#94a3b8;margin-bottom:5px; }
+.pl-meta { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+.open-t   { background:#f0fdf4;color:#15803d;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:600; }
+.closed-t { background:#fef2f2;color:#dc2626;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:600; }
+.dir-a { font-size:12px;color:#2563eb;font-weight:600;text-decoration:none; }
+.dir-a:hover { text-decoration:underline; }
+.star { color:#f59e0b;font-size:12px; }
+
+.info-bar { background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;font-size:13px;color:#1e40af;margin-bottom:18px;display:flex;align-items:center;gap:10px; }
+.err-bar  { background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px 16px;font-size:13px;color:#dc2626;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-weight:600; }
+.nores-box { background:white;border-radius:18px;border:2px dashed #e2e8f0;padding:40px 20px;text-align:center;color:#94a3b8; }
+.nores-box i { font-size:2rem;color:#cbd5e1;margin-bottom:10px; }
+</style>
+
+<div class="nearby-wrap">
+<div class="container">
+
+  <div class="nb-header">
+    <div class="nb-icon"><i class="fas fa-map-marker-alt"></i></div>
+    <div>
+      <h2>Nearby Hospitals & Pharmacies</h2>
+      <p>Live Google Maps — find medical facilities near you</p>
+    </div>
+  </div>
+
+  {% if not api_key %}
+  <div class="info-bar">
+    <i class="fas fa-info-circle"></i>
+    Google Maps API key not found. Add <code>GOOGLE_MAPS_API_KEY=your_key</code> to <code>.env</code>
+  </div>
+  {% endif %}
+
+  {% if error %}
+  <div class="err-bar"><i class="fas fa-exclamation-triangle"></i>{{ error }}</div>
+  {% endif %}
+
+  <!-- Search -->
+  <div class="search-card">
+    <form method="POST" id="sf">
+      <input type="hidden" id="latInput" name="latitude"  value="{{ lat or '13.0827' }}">
+      <input type="hidden" id="lngInput" name="longitude" value="{{ lng or '80.2707' }}">
+      <div class="sf-row">
+        <div class="sf-group">
+          <div class="sf-label">Radius</div>
+          <select name="radius" class="sf-select">
+            <option value="2000">2 km</option>
+            <option value="5000" {% if radius=='5000' or not radius %}selected{% endif %}>5 km</option>
+            <option value="10000" {% if radius=='10000' %}selected{% endif %}>10 km</option>
+            <option value="20000" {% if radius=='20000' %}selected{% endif %}>20 km</option>
+          </select>
+        </div>
+        <div class="sf-group">
+          <div class="sf-label">Find</div>
+          <select name="search_type" class="sf-select">
+            <option value="both">Hospitals & Pharmacies</option>
+            <option value="hospital">Hospitals Only</option>
+            <option value="pharmacy">Pharmacies Only</option>
+          </select>
+        </div>
+        <button type="button" class="btn-loc" id="locBtn" onclick="locateMe()">
+          <i class="fas fa-crosshairs"></i> Use My Location
+        </button>
+        <button type="submit" class="btn-search">
+          <i class="fas fa-search"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Map + Results -->
+  <div class="map-layout">
+
+    <!-- MAP -->
+    <div>
+      {% if hospitals or pharmacies %}
+        {# Build the query string for the embedded map showing all results #}
+        {% set first = (hospitals + pharmacies)[0] %}
+        <iframe id="mapFrame"
+          src="https://maps.google.com/maps?q={{ first.lat }},{{ first.lng }}&z=13&output=embed"
+          allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      {% elif lat and api_key %}
+        <iframe id="mapFrame"
+          src="https://maps.google.com/maps?q=hospitals+near+{{ lat }},{{ lng }}&z=13&output=embed"
+          allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      {% else %}
+        <div class="map-placeholder">
+          <i class="fas fa-map-marked-alt d-block"></i>
+          <p>Click <strong>"Use My Location"</strong> then <strong>Search</strong> to see the map and nearby facilities here.</p>
+          <p style="font-size:12px;">Or: <a href="https://www.google.com/maps/search/hospitals+near+me" target="_blank" style="color:#2563eb;font-weight:600;">Open Google Maps →</a></p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results-scroll">
+      {% if hospitals %}
+      <div class="sec-head">
+        <i class="fas fa-hospital text-danger"></i>
+        Hospitals <span class="res-count">{{ hospitals|length }}</span>
+      </div>
+      {% for h in hospitals %}
+      <div class="place-card" onclick="openMap({{ h.lat }}, {{ h.lng }})">
+        <div class="pl-icon pi-h"><i class="fas fa-hospital"></i></div>
+        <div>
+          <div class="pl-name">{{ h.name }}</div>
+          <div class="pl-addr">{{ h.address }}</div>
+          <div class="pl-meta">
+            {% if h.rating and h.rating != 'N/A' %}<span class="star">★ {{ h.rating }}</span>{% endif %}
+            {% if h.open_now == True %}<span class="open-t">Open</span>
+            {% elif h.open_now == False %}<span class="closed-t">Closed</span>{% endif %}
+            <a class="dir-a" href="https://maps.google.com/?q={{ h.lat }},{{ h.lng }}" target="_blank">
+              <i class="fas fa-directions me-1"></i>Directions
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      {% if pharmacies %}
+      <div class="sec-head mt-3">
+        <i class="fas fa-pills text-success"></i>
+        Pharmacies <span class="res-count">{{ pharmacies|length }}</span>
+      </div>
+      {% for p in pharmacies %}
+      <div class="place-card" onclick="openMap({{ p.lat }}, {{ p.lng }})">
+        <div class="pl-icon pi-p"><i class="fas fa-pills"></i></div>
+        <div>
+          <div class="pl-name">{{ p.name }}</div>
+          <div class="pl-addr">{{ p.address }}</div>
+          <div class="pl-meta">
+            {% if p.rating and p.rating != 'N/A' %}<span class="star">★ {{ p.rating }}</span>{% endif %}
+            {% if p.open_now == True %}<span class="open-t">Open</span>
+            {% elif p.open_now == False %}<span class="closed-t">Closed</span>{% endif %}
+            <a class="dir-a" href="https://maps.google.com/?q={{ p.lat }},{{ p.lng }}" target="_blank">
+              <i class="fas fa-directions me-1"></i>Directions
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+      {% if not hospitals and not pharmacies %}
+      <div class="nores-box">
+        <i class="fas fa-map-marker-alt d-block"></i>
+        <p>Click <strong>Use My Location</strong> then press <strong>Search</strong> to find nearby places.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+function locateMe() {
+  var btn = document.getElementById('locBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding...';
+  if (!navigator.geolocation) {
+    alert('Geolocation is not supported by your browser.');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      document.getElementById('latInput').value = pos.coords.latitude.toFixed(6);
+      document.getElementById('lngInput').value = pos.coords.longitude.toFixed(6);
+      btn.innerHTML = '<i class="fas fa-check"></i> Location Set!';
+      btn.classList.add('located');
+    },
+    function(err) {
+      btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Location';
+      alert('Location error: ' + err.message + '\nPlease allow location access in your browser settings.');
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
+
+function openMap(lat, lng) {
+  var frame = document.getElementById('mapFrame');
+  if (frame) {
+    frame.src = 'https://maps.google.com/maps?q=' + lat + ',' + lng + '&z=16&output=embed';
+  }
+}
+</script>
+{% endblock %}

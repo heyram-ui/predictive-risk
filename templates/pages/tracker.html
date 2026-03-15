@@ -1,102 +1,202 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container py-5">
-    <div class="row g-4">
-        
-        <div class="col-lg-4">
-            <div class="health-card bg-primary text-white h-100 position-relative overflow-hidden">
-                <h4 class="fw-bold mb-1">Recovery Plan</h4>
-                <p class="opacity-75 mb-4">Focus: {{ disease }}</p>
-                
-                <div class="vstack gap-3">
-                    {% for phase, action in plan.items() %}
-                    <div class="bg-white bg-opacity-10 p-3 rounded-3 border border-white border-opacity-25">
-                        <small class="text-warning fw-bold text-uppercase">{{ phase }}</small>
-                        <p class="mb-0 small mt-1">{{ action }}</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body { font-family:'Inter',sans-serif !important; background:#f0f4f8; }
+.tracker-wrap { padding: 40px 0 80px; }
 
-        <div class="col-lg-5">
-            <div class="health-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Today's Log</h5>
-                    <span class="badge bg-light text-dark">{{ date }}</span>
-                </div>
-                
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">DIET QUALITY (1-5)</label>
-                        <div class="d-flex justify-content-between px-2">
-                            <span class="small">Cheat Day</span>
-                            <span class="small">Perfect</span>
-                        </div>
-                        <input type="range" class="form-range" min="1" max="5" name="diet" required>
-                    </div>
+.plan-card {
+    background: linear-gradient(135deg,#0a0e1a,#0d6e6e);
+    color:white; border-radius:24px; padding:30px; height:100%;
+}
+.plan-card h4 { font-weight:800; letter-spacing:-0.02em; }
+.plan-card .disease-tag {
+    display:inline-block; background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.25); border-radius:50px;
+    padding:4px 14px; font-size:13px; font-weight:600; margin-bottom:20px;
+}
+.phase-item {
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+    border-radius:14px; padding:14px 16px; margin-bottom:10px;
+}
+.phase-item small { color:rgba(255,255,255,0.5); font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:0.08em; }
+.phase-item p { margin:5px 0 0; font-size:14px; opacity:0.9; }
 
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">EXERCISE (MINUTES)</label>
-                        <input type="number" class="form-control" name="exercise" placeholder="e.g. 30" required>
-                    </div>
+.log-card {
+    background:white; border-radius:24px; padding:30px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.07); border:1px solid #e2e8f0; height:100%;
+}
+.log-card h5 { font-weight:700; color:#0d1b2a; padding-bottom:14px; border-bottom:2px solid #f0f4f8; margin-bottom:20px; }
 
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">PAIN/SYMPTOM SEVERITY (1-10)</label>
-                        <select class="form-select" name="severity">
-                            <option value="1">1 - Feeling Great</option>
-                            <option value="3">3 - Mild Discomfort</option>
-                            <option value="5">5 - Moderate Pain</option>
-                            <option value="8">8 - Severe</option>
-                            <option value="10">10 - Unbearable</option>
-                        </select>
-                    </div>
+.custom-label { font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+.custom-input { border:2px solid #e2e8f0; border-radius:12px; padding:10px 14px; width:100%; font-family:'Inter',sans-serif; transition:border-color 0.2s; }
+.custom-input:focus { outline:none; border-color:#0d6e6e; }
 
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold">DAILY NOTES</label>
-                        <textarea class="form-control" name="notes" rows="2" placeholder="How do you feel today?"></textarea>
-                    </div>
+.range-wrap { position:relative; }
+.range-wrap input[type=range] { -webkit-appearance:none; width:100%; height:6px; border-radius:3px; background:linear-gradient(to right,#10b981,#f59e0b,#ef4444); cursor:pointer; }
+.range-wrap input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#0d6e6e; border:3px solid white; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+.range-labels { display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:4px; }
 
-                    <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold">
-                        <i class="fas fa-save me-2"></i>Save Daily Progress
-                    </button>
-                </form>
-            </div>
-        </div>
+.save-btn {
+    width:100%; padding:13px; border:none; border-radius:50px;
+    background:linear-gradient(135deg,#059669,#10b981);
+    color:white; font-weight:700; font-size:1rem;
+    box-shadow:0 6px 20px rgba(16,185,129,0.35); cursor:pointer;
+    transition:transform 0.2s, box-shadow 0.2s;
+}
+.save-btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(16,185,129,0.45); }
 
-        <div class="col-lg-3">
-            <div class="health-card h-100 text-center">
-                <h6 class="text-muted fw-bold mb-3">Symptom Trend</h6>
-                <div style="height: 200px;">
-                    <canvas id="trackerChart"></canvas>
-                </div>
-                <small class="text-muted d-block mt-3">Goal: Keep the line going down!</small>
-            </div>
-        </div>
+.chart-card {
+    background:white; border-radius:24px; padding:26px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.07); border:1px solid #e2e8f0; height:100%;
+    display:flex; flex-direction:column;
+}
+.chart-card h6 { font-weight:700; color:#0d1b2a; margin-bottom:4px; }
+.chart-card small { color:#94a3b8; font-size:12px; }
+.chart-tip {
+    background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px;
+    padding:10px 14px; font-size:12px; color:#15803d; font-weight:600;
+    margin-top:auto; padding-top:12px;
+}
+</style>
+
+<div class="tracker-wrap">
+  <div class="container">
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,#0d6e6e,#10b981);border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;box-shadow:0 4px 16px rgba(13,110,110,0.3);">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div>
+        <h2 style="font-weight:900;letter-spacing:-0.02em;margin:0;color:#0d1b2a;">Daily Health Tracker</h2>
+        <p style="color:#64748b;margin:0;font-size:14px;">{{ date }} — Log today's progress</p>
+      </div>
     </div>
+
+    <div class="row g-4">
+
+      <!-- Recovery Plan -->
+      <div class="col-lg-4">
+        <div class="plan-card">
+          <h4>Your Recovery Plan</h4>
+          <div class="disease-tag">🎯 {{ disease }}</div>
+          {% for phase, action in plan.items() %}
+          <div class="phase-item">
+            <small>{{ phase }}</small>
+            <p>{{ action }}</p>
+          </div>
+          {% endfor %}
+          <div class="mt-3 pt-2" style="border-top:1px solid rgba(255,255,255,0.1);font-size:13px;opacity:0.6;">
+            <i class="fas fa-info-circle me-2"></i>
+            Use <a href="/symptom-checker" style="color:#34d399;">Symptom Checker</a> to update your condition
+          </div>
+        </div>
+      </div>
+
+      <!-- Log Form -->
+      <div class="col-lg-5">
+        <div class="log-card">
+          <h5><i class="fas fa-edit me-2 text-success"></i>Today's Log</h5>
+          <form method="POST">
+            <div class="mb-3">
+              <label class="custom-label">Diet Quality (1–5)</label>
+              <div class="range-wrap">
+                <input type="range" min="1" max="5" name="diet" value="3" required
+                       oninput="document.getElementById('dietVal').textContent=this.value">
+                <div class="range-labels">
+                  <span>Junk Food</span><span>Balanced</span><span>🥗 Perfect</span>
+                </div>
+              </div>
+              <div class="text-center mt-1" style="font-size:13px;font-weight:700;color:#0d6e6e;">Value: <span id="dietVal">3</span></div>
+            </div>
+
+            <div class="mb-3">
+              <label class="custom-label">Exercise Today (minutes)</label>
+              <input type="number" class="custom-input" name="exercise" placeholder="e.g. 30" min="0" max="300" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="custom-label">Symptom Severity (1–10)</label>
+              <select class="custom-input" name="severity">
+                <option value="1">1 – Feeling Great 💪</option>
+                <option value="2">2 – Very Good</option>
+                <option value="3">3 – Mild Discomfort</option>
+                <option value="4">4 – Noticeable</option>
+                <option value="5" selected>5 – Moderate</option>
+                <option value="6">6 – Uncomfortable</option>
+                <option value="7">7 – Significant Pain</option>
+                <option value="8">8 – Severe</option>
+                <option value="9">9 – Very Severe</option>
+                <option value="10">10 – Emergency 🚨</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="custom-label">Daily Notes</label>
+              <textarea class="custom-input" name="notes" rows="2" placeholder="How do you feel today? Any changes?"></textarea>
+            </div>
+
+            <button type="submit" class="save-btn">
+              <i class="fas fa-save me-2"></i>Save Today's Progress
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="col-lg-3">
+        <div class="chart-card">
+          <h6><i class="fas fa-chart-bar me-2 text-danger"></i>Symptom Trend</h6>
+          <small>Your last 7 days</small>
+          <div style="flex:1;min-height:180px;margin-top:16px;">
+            <canvas id="trackerChart"></canvas>
+          </div>
+          <div class="chart-tip mt-3">
+            <i class="fas fa-arrow-down me-1"></i> Goal: Keep the line going down!
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/assess" class="btn rounded-pill px-4 fw-bold text-white me-2"
+         style="background:linear-gradient(135deg,#0d6e6e,#10b981);box-shadow:0 4px 16px rgba(13,110,110,0.3);">
+        <i class="fas fa-heartbeat me-2"></i>Run Full Risk Check
+      </a>
+      <a href="/download_report" class="btn rounded-pill px-4 fw-bold text-white"
+         style="background:linear-gradient(135deg,#7c3aed,#6d28d9);box-shadow:0 4px 16px rgba(124,58,237,0.3);">
+        <i class="fas fa-file-pdf me-2"></i>Download My Report
+      </a>
+    </div>
+
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('trackerChart');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {{ dates|tojson|safe }},
-            datasets: [{
-                label: 'Pain Level',
-                data: {{ severity|tojson|safe }},
-                backgroundColor: '#ef4444',
-                borderRadius: 5
-            }]
+const ctx = document.getElementById('trackerChart');
+const tDates  = {{ dates|tojson|safe }};
+const tScores = {{ severity|tojson|safe }};
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: tDates.length ? tDates : ['No data'],
+        datasets: [{
+            label: 'Severity',
+            data: tScores.length ? tScores : [0],
+            backgroundColor: tScores.map(v => v >= 7 ? '#ef4444' : v >= 4 ? '#f59e0b' : '#10b981'),
+            borderRadius: 8, borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+            y: { beginAtZero:true, max:10, ticks:{stepSize:2}, grid:{color:'#f0f4f8'} },
+            x: { grid:{display:false} }
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { beginAtZero: true, max: 10 } },
-            plugins: { legend: { display: false } }
-        }
-    });
+        plugins: { legend:{display:false} }
+    }
+});
 </script>
 {% endblock %}

@@ -1,77 +1,213 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="animate-in">
-    <h2 class="text-white-shadow text-center mb-5">Healthy Living Guide</h2>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body { font-family:'Inter',sans-serif !important; background:#f0f4f8; }
 
-    <div class="row">
-        <!-- Foods -->
-        <div class="col-md-6">
-            <div class="glass-card">
-                <h3 class="text-success mb-4"><i class="fas fa-apple-alt me-2"></i>Nutrient-Rich Foods</h3>
-                <div class="accordion" id="foodAccordion">
-                    <div class="accordion-item bg-transparent border-0">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed glass-card mb-2" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                                <i class="fas fa-leaf me-2 text-success"></i> Leafy Greens
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#foodAccordion">
-                            <div class="accordion-body bg-white rounded">
-                                Spinach, Kale, Swiss Chard - High in Vitamin A, C, K and Iron.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item bg-transparent border-0">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed glass-card mb-2" type="button"
-                                data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                                <i class="fas fa-fish me-2 text-info"></i> Fatty Fish
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#foodAccordion">
-                            <div class="accordion-body bg-white rounded">
-                                Salmon, Mackerel, Sardines - Rich in Omega-3 fatty acids for heart health.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+.rec-hero {
+    background: linear-gradient(135deg,#312e81,#4c1d95);
+    color: white; padding: 65px 0 45px;
+}
+.rec-hero h1 { font-size:2.3rem; font-weight:900; letter-spacing:-0.02em; }
 
-        <!-- Exercises -->
-        <div class="col-md-6">
-            <div class="glass-card">
-                <h3 class="text-warning mb-4"><i class="fas fa-dumbbell me-2"></i>Effective Exercises</h3>
-                <div class="list-group list-group-flush bg-transparent">
-                    <a href="#"
-                        class="list-group-item list-group-item-action bg-transparent text-dark border-bottom border-light">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">Brisk Walking</h5>
-                            <small>30 mins/day</small>
-                        </div>
-                        <p class="mb-1">Low impact key for cardiovascular health.</p>
-                    </a>
-                    <a href="#"
-                        class="list-group-item list-group-item-action bg-transparent text-dark border-bottom border-light">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">HIIT</h5>
-                            <small>20 mins/day</small>
-                        </div>
-                        <p class="mb-1">High Intensity Interval Training for metabolic boost.</p>
-                    </a>
-                    <a href="#"
-                        class="list-group-item list-group-item-action bg-transparent text-dark border-bottom border-light">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">Yoga</h5>
-                            <small>45 mins/day</small>
-                        </div>
-                        <p class="mb-1">Great for flexibility and mental stress reduction.</p>
-                    </a>
-                </div>
-            </div>
-        </div>
+.rec-body { padding: 50px 0 80px; }
+
+.rec-section-title {
+    font-size:1.25rem; font-weight:800; color:#0d1b2a;
+    border-left:4px solid #7c3aed; padding-left:14px; margin-bottom:20px;
+}
+
+.rec-card {
+    background:white; border-radius:18px; padding:24px 22px;
+    border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    height:100%; transition:transform 0.2s, box-shadow 0.2s;
+    position:relative; overflow:hidden;
+}
+.rec-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:4px;
+}
+.rc-diabetes::before { background:linear-gradient(90deg,#f59e0b,#d97706); }
+.rc-heart::before    { background:linear-gradient(90deg,#ef4444,#dc2626); }
+.rc-sleep::before    { background:linear-gradient(90deg,#7c3aed,#6d28d9); }
+.rc-bp::before       { background:linear-gradient(90deg,#3b82f6,#2563eb); }
+.rc-mental::before   { background:linear-gradient(90deg,#10b981,#059669); }
+.rc-general::before  { background:linear-gradient(90deg,#0d6e6e,#0891b2); }
+
+.rec-card:hover { transform:translateY(-4px); box-shadow:0 14px 36px rgba(0,0,0,0.1); }
+.rec-card h5 { font-weight:700; font-size:16px; color:#0d1b2a; margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+.rec-card h5 i { font-size:1.1rem; }
+
+.rec-list { list-style:none; padding:0; margin:0; }
+.rec-list li {
+    padding:8px 0; border-bottom:1px solid #f1f5f9;
+    font-size:14px; color:#374151; display:flex; align-items:flex-start; gap:10px;
+}
+.rec-list li:last-child { border-bottom:none; }
+.rec-list li::before {
+    content:'✓'; color:#10b981; font-weight:800;
+    font-size:13px; flex-shrink:0; margin-top:1px;
+}
+
+.tip-banner {
+    background: linear-gradient(135deg,#0d6e6e,#0891b2);
+    border-radius:20px; padding:32px;
+    color:white; margin-top:12px;
+    display:flex; align-items:center; gap:20px;
+}
+.tip-banner i { font-size:2.5rem; opacity:0.8; flex-shrink:0; }
+.tip-banner h5 { font-weight:700; margin-bottom:6px; }
+.tip-banner p  { opacity:0.8; font-size:14px; margin:0; }
+</style>
+
+<div class="rec-hero">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3">
+      <div style="width:52px;height:52px;background:rgba(255,255,255,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+        <i class="fas fa-lightbulb"></i>
+      </div>
+      <div>
+        <h1 class="mb-1">Health Recommendations</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,0.7);">Evidence-based daily lifestyle tips to reduce your disease risk</p>
+      </div>
     </div>
+  </div>
+</div>
+
+<div class="rec-body">
+  <div class="container">
+
+    <div class="tip-banner mb-5">
+      <i class="fas fa-robot"></i>
+      <div>
+        <h5>How our ML uses these recommendations</h5>
+        <p>After predicting your risk profile, the system cross-references your specific risk factors against these guidelines to generate your personalized action plan in the PDF report.</p>
+      </div>
+    </div>
+
+    <!-- Diabetes -->
+    <div class="rec-section-title mb-3 mt-4"><i class="fas fa-tint me-2 text-warning"></i>Diabetes Prevention</div>
+    <div class="row g-3 mb-5">
+      <div class="col-md-4">
+        <div class="rec-card rc-diabetes">
+          <h5><i class="fas fa-utensils text-warning"></i> Diet</h5>
+          <ul class="rec-list">
+            <li>Choose whole grains over white rice/bread</li>
+            <li>Limit sugar to &lt;25g/day (WHO standard)</li>
+            <li>Eat high-fiber vegetables at every meal</li>
+            <li>Avoid sugary drinks (soda, juice)</li>
+            <li>Include bitter gourd, fenugreek in diet</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="rec-card rc-diabetes">
+          <h5><i class="fas fa-running text-warning"></i> Exercise</h5>
+          <ul class="rec-list">
+            <li>150 min/week moderate aerobic exercise</li>
+            <li>Strength training 2–3x per week</li>
+            <li>Walk 10 minutes after each meal</li>
+            <li>Avoid sitting for more than 30 min straight</li>
+            <li>Aim for 7,000–10,000 steps daily</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="rec-card rc-diabetes">
+          <h5><i class="fas fa-moon text-warning"></i> Lifestyle</h5>
+          <ul class="rec-list">
+            <li>Maintain BMI between 18.5–24.9</li>
+            <li>Sleep 7–8 hours per night</li>
+            <li>Monitor blood glucose quarterly</li>
+            <li>Reduce stress with yoga/meditation</li>
+            <li>Quit smoking — 2x diabetes risk factor</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Heart -->
+    <div class="rec-section-title mb-3"><i class="fas fa-heartbeat me-2 text-danger"></i>Heart Disease Prevention</div>
+    <div class="row g-3 mb-5">
+      <div class="col-md-4">
+        <div class="rec-card rc-heart">
+          <h5><i class="fas fa-utensils text-danger"></i> Diet</h5>
+          <ul class="rec-list">
+            <li>DASH diet — reduce sodium to &lt;2g/day</li>
+            <li>Eat oats, salmon, berries, and nuts</li>
+            <li>Avoid trans fats and processed meats</li>
+            <li>Include olive oil instead of butter</li>
+            <li>Limit alcohol — max 1 drink/day</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="rec-card rc-heart">
+          <h5><i class="fas fa-running text-danger"></i> Exercise</h5>
+          <ul class="rec-list">
+            <li>Brisk walking 30 min/day, 5 days a week</li>
+            <li>Swimming or cycling for cardio health</li>
+            <li>Avoid sudden vigorous exertion</li>
+            <li>Yoga reduces heart risk by 30–40%</li>
+            <li>Monitor pulse during exercise</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="rec-card rc-heart">
+          <h5><i class="fas fa-shield-alt text-danger"></i> Monitoring</h5>
+          <ul class="rec-list">
+            <li>Check BP every 6 months (target &lt;120/80)</li>
+            <li>Annual cholesterol check after age 35</li>
+            <li>Keep resting heart rate 60–100 bpm</li>
+            <li>ECG check if you feel palpitations</li>
+            <li>Manage stress — cortisol damages arteries</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sleep & Mental Health -->
+    <div class="rec-section-title mb-3"><i class="fas fa-bed me-2 text-purple" style="color:#7c3aed"></i>Sleep & Mental Health</div>
+    <div class="row g-3 mb-5">
+      <div class="col-md-6">
+        <div class="rec-card rc-sleep">
+          <h5><i class="fas fa-bed" style="color:#7c3aed"></i> Better Sleep Habits</h5>
+          <ul class="rec-list">
+            <li>Sleep and wake at the same time daily</li>
+            <li>No screens 1 hour before bed</li>
+            <li>Keep room cool (18–20°C) and dark</li>
+            <li>Avoid caffeine after 2 PM</li>
+            <li>Try Yoga Nidra or Viparita Karani pose</li>
+            <li>7–9 hours is the WHO recommended target</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="rec-card rc-mental">
+          <h5><i class="fas fa-brain" style="color:#10b981"></i> Mental Wellness</h5>
+          <ul class="rec-list">
+            <li>Practice deep breathing for 5 min daily</li>
+            <li>Limit news/social media to 30 min/day</li>
+            <li>Journal your thoughts each morning</li>
+            <li>Maintain social connections — talk daily</li>
+            <li>Seek professional help if stress score &gt;7</li>
+            <li>Exercise releases serotonin — move daily!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <a href="/assess" class="btn btn-lg rounded-pill px-5 fw-bold text-white me-3"
+         style="background:linear-gradient(135deg,#7c3aed,#6d28d9);box-shadow:0 8px 24px rgba(124,58,237,0.35);">
+        <i class="fas fa-heartbeat me-2"></i>Run My Risk Assessment
+      </a>
+      <a href="/download_report" class="btn btn-lg rounded-pill px-5 fw-bold text-white"
+         style="background:linear-gradient(135deg,#0d6e6e,#10b981);box-shadow:0 8px 24px rgba(13,110,110,0.35);">
+        <i class="fas fa-file-pdf me-2"></i>Download My Report
+      </a>
+    </div>
+
+  </div>
 </div>
 {% endblock %}
