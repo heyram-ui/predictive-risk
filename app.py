@@ -18,6 +18,7 @@ import numpy as np
 import os
 from dotenv import load_dotenv
 from io import BytesIO
+import psycopg  # instead of import psycopg2
 
 # =============================================================================
 # DISEASE PREDICTOR — flexible import (subfolder OR root)
@@ -140,7 +141,7 @@ except Exception as e:
 HEALTH_KNOWLEDGE_BASE = {
     'Diabetes Type 2': {
         'title': 'Type 2 Diabetes', 'icon': 'fa-tint', 'color': 'warning',
-        'symptoms': ['Thirst', 'Frequent Urination', 'Blurry Vision', 'Fatigue'],
+        'symptoms': ['Thirst', 'Frequent Urination', 'Blurry Vision', 'Fatigue', 'Slow Healing Wounds', 'Tingling in Hands'],
         'struggle': 'Energy crashes, dizziness, constant hunger.',
         'daily_plan': {
             'Phase 1': 'Strict Low Carb Diet. 15 mins walking.',
@@ -149,12 +150,12 @@ HEALTH_KNOWLEDGE_BASE = {
         },
         'recovery': {
             'yoga': [{'name': 'Kapalbhati'}, {'name': 'Dhanurasana'}],
-            'diet': {'good': ['Leafy Greens', 'Bitter Gourd'], 'bad': ['Sugar', 'Rice']}
+            'diet': {'good': ['Leafy Greens', 'Bitter Gourd', 'Whole Grains'], 'bad': ['Sugar', 'White Rice', 'Soda']}
         }
     },
     'Heart Disease': {
         'title': 'Heart Disease', 'icon': 'fa-heartbeat', 'color': 'danger',
-        'symptoms': ['Chest Pain', 'Shortness of Breath', 'Palpitations', 'Fatigue'],
+        'symptoms': ['Chest Pain', 'Shortness of Breath', 'Palpitations', 'Fatigue', 'Swelling in Legs', 'Dizziness'],
         'struggle': 'Difficulty climbing stairs, tiredness.',
         'daily_plan': {
             'Phase 1': 'Complete Rest. No salt.',
@@ -163,12 +164,12 @@ HEALTH_KNOWLEDGE_BASE = {
         },
         'recovery': {
             'yoga': [{'name': 'Tadasana'}, {'name': 'Shavasana'}],
-            'diet': {'good': ['Oats', 'Salmon', 'Berries'], 'bad': ['Fried foods', 'Salt']}
+            'diet': {'good': ['Oats', 'Salmon', 'Berries'], 'bad': ['Fried foods', 'Salt', 'Red Meat']}
         }
     },
     'Sleep Insomnia': {
         'title': 'Insomnia', 'icon': 'fa-bed', 'color': 'primary',
-        'symptoms': ["Can't Sleep", 'Irritability', 'Headaches', 'Focus issues'],
+        'symptoms': ["Can't Sleep", 'Irritability', 'Headaches', 'Focus issues', 'Daytime Drowsiness', 'Mood Swings'],
         'struggle': 'Chronic fatigue, brain fog.',
         'daily_plan': {
             'Phase 1': 'No Screens after 8 PM.',
@@ -177,12 +178,12 @@ HEALTH_KNOWLEDGE_BASE = {
         },
         'recovery': {
             'yoga': [{'name': 'Yoga Nidra'}, {'name': 'Viparita Karani'}],
-            'diet': {'good': ['Warm Milk', 'Almonds'], 'bad': ['Caffeine', 'Phone']}
+            'diet': {'good': ['Warm Milk', 'Almonds', 'Chamomile Tea'], 'bad': ['Caffeine', 'Alcohol', 'Heavy Meals']}
         }
     },
     'Hypertension': {
         'title': 'Hypertension', 'icon': 'fa-tachometer-alt', 'color': 'danger',
-        'symptoms': ['Headache', 'Nosebleed', 'Vision issues', 'Chest pain'],
+        'symptoms': ['Headache', 'Nosebleed', 'Vision issues', 'Chest pain', 'Dizziness', 'Ringing in Ears'],
         'struggle': 'Dizziness, flushing.',
         'daily_plan': {
             'Phase 1': 'DASH Diet (Low Sodium).',
@@ -191,12 +192,12 @@ HEALTH_KNOWLEDGE_BASE = {
         },
         'recovery': {
             'yoga': [{'name': 'Balasana'}, {'name': 'Sukhasana'}],
-            'diet': {'good': ['Bananas', 'Beetroot'], 'bad': ['Pickles', 'Salt']}
+            'diet': {'good': ['Bananas', 'Beetroot', 'Spinach'], 'bad': ['Pickles', 'Salt', 'Canned Food']}
         }
     },
     'Migraine': {
         'title': 'Migraine', 'icon': 'fa-brain', 'color': 'info',
-        'symptoms': ['Throbbing Headache', 'Sensitivity to Light', 'Nausea'],
+        'symptoms': ['Throbbing Headache', 'Sensitivity to Light', 'Nausea', 'Aura', 'Sensitivity to Sound'],
         'struggle': 'Cannot tolerate light/sound.',
         'daily_plan': {
             'Phase 1': 'Dark room rest. Hydration.',
@@ -205,12 +206,12 @@ HEALTH_KNOWLEDGE_BASE = {
         },
         'recovery': {
             'yoga': [{'name': 'Shishuasana'}, {'name': 'Setu Bandhasana'}],
-            'diet': {'good': ['Ginger Tea', 'Water'], 'bad': ['Cheese', 'Wine']}
+            'diet': {'good': ['Ginger Tea', 'Water', 'Magnesium-rich foods'], 'bad': ['Cheese', 'Wine', 'Chocolate']}
         }
     },
     'Obesity': {
         'title': 'Obesity', 'icon': 'fa-weight', 'color': 'warning',
-        'symptoms': ['Breathlessness', 'Joint pain', 'Snoring'],
+        'symptoms': ['Breathlessness', 'Joint pain', 'Snoring', 'Excessive Sweating', 'Back Pain', 'Low Energy'],
         'struggle': 'Low stamina, body pain.',
         'daily_plan': {
             'Phase 1': 'Calorie Deficit. High Protein.',
@@ -219,12 +220,12 @@ HEALTH_KNOWLEDGE_BASE = {
         },
         'recovery': {
             'yoga': [{'name': 'Surya Namaskar'}, {'name': 'Virabhadrasana'}],
-            'diet': {'good': ['High Protein', 'Fiber'], 'bad': ['Sugary drinks', 'Junk']}
+            'diet': {'good': ['High Protein', 'Fiber', 'Green Vegetables'], 'bad': ['Sugary drinks', 'Junk Food', 'Processed Food']}
         }
     },
     'Common Cold': {
         'title': 'Common Cold', 'icon': 'fa-snowflake', 'color': 'info',
-        'symptoms': ['Runny Nose', 'Sore Throat', 'Fever', 'Cough'],
+        'symptoms': ['Runny Nose', 'Sore Throat', 'Fever', 'Cough', 'Sneezing', 'Body Aches'],
         'struggle': 'Weakness, congestion.',
         'daily_plan': {
             'Phase 1': 'Bed rest. Ginger tea.',
@@ -233,9 +234,261 @@ HEALTH_KNOWLEDGE_BASE = {
         },
         'recovery': {
             'yoga': [{'name': 'Matsyasana'}, {'name': 'Viparita Karani'}],
-            'diet': {'good': ['Soup', 'Garlic'], 'bad': ['Cold drinks', 'Dairy']}
+            'diet': {'good': ['Soup', 'Garlic', 'Honey'], 'bad': ['Cold drinks', 'Dairy', 'Fried Food']}
         }
-    }
+    },
+    'Asthma': {
+        'title': 'Asthma', 'icon': 'fa-lungs', 'color': 'warning',
+        'symptoms': ['Wheezing', 'Shortness of Breath', 'Chest Tightness', 'Cough', 'Difficulty Breathing at Night'],
+        'struggle': 'Breathing difficulty during exercise or cold weather.',
+        'daily_plan': {
+            'Phase 1': 'Avoid triggers (dust, smoke, pollen).',
+            'Phase 2': 'Use prescribed inhaler. Breathing exercises.',
+            'Phase 3': 'Gradual physical activity increase.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Pranayama'}, {'name': 'Sukhasana'}],
+            'diet': {'good': ['Ginger', 'Turmeric', 'Omega-3 Fish'], 'bad': ['Sulfite foods', 'Cold drinks', 'Processed food']}
+        }
+    },
+    'Anxiety Disorder': {
+        'title': 'Anxiety Disorder', 'icon': 'fa-brain', 'color': 'warning',
+        'symptoms': ['Restlessness', 'Rapid Heartbeat', 'Excessive Worry', 'Muscle Tension', 'Panic Attacks', 'Difficulty Concentrating'],
+        'struggle': 'Constant worry, difficulty relaxing.',
+        'daily_plan': {
+            'Phase 1': 'Deep breathing exercises. Limit news.',
+            'Phase 2': 'CBT journaling. Regular exercise.',
+            'Phase 3': 'Meditation 20 mins daily.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Shavasana'}, {'name': 'Balasana'}],
+            'diet': {'good': ['Green Tea', 'Dark Chocolate', 'Salmon'], 'bad': ['Caffeine', 'Alcohol', 'Sugar']}
+        }
+    },
+    'Depression': {
+        'title': 'Depression', 'icon': 'fa-cloud-rain', 'color': 'primary',
+        'symptoms': ['Persistent Sadness', 'Loss of Interest', 'Fatigue', 'Sleep Changes', 'Appetite Changes', 'Difficulty Concentrating'],
+        'struggle': 'No motivation, emotional numbness.',
+        'daily_plan': {
+            'Phase 1': 'Reach out to someone. Walk 10 mins.',
+            'Phase 2': 'Establish routine. Sunlight exposure.',
+            'Phase 3': 'Regular exercise. Social activities.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Surya Namaskar'}, {'name': 'Viparita Karani'}],
+            'diet': {'good': ['Omega-3 foods', 'Nuts', 'Berries'], 'bad': ['Alcohol', 'Processed food', 'Excessive sugar']}
+        }
+    },
+    'Chronic Back Pain': {
+        'title': 'Chronic Back Pain', 'icon': 'fa-procedures', 'color': 'danger',
+        'symptoms': ['Lower Back Pain', 'Stiffness', 'Muscle Spasms', 'Radiating Leg Pain', 'Difficulty Standing'],
+        'struggle': 'Cannot sit or stand for long periods.',
+        'daily_plan': {
+            'Phase 1': 'Hot/cold therapy. Gentle stretching.',
+            'Phase 2': 'Core strengthening exercises.',
+            'Phase 3': 'Ergonomic workspace setup.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Bhujangasana'}, {'name': 'Marjaryasana'}],
+            'diet': {'good': ['Anti-inflammatory foods', 'Calcium-rich food', 'Turmeric'], 'bad': ['Processed food', 'Sugary drinks', 'Excessive sitting']}
+        }
+    },
+    'Arthritis': {
+        'title': 'Arthritis', 'icon': 'fa-bone', 'color': 'warning',
+        'symptoms': ['Joint pain', 'Joint Swelling', 'Stiffness', 'Reduced Range of Motion', 'Joint Redness'],
+        'struggle': 'Morning stiffness, difficulty with daily tasks.',
+        'daily_plan': {
+            'Phase 1': 'Gentle joint mobilization. Anti-inflammatory diet.',
+            'Phase 2': 'Low-impact exercise (swimming, cycling).',
+            'Phase 3': 'Strength training around joints.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Virabhadrasana'}, {'name': 'Trikonasana'}],
+            'diet': {'good': ['Fish', 'Olive Oil', 'Berries'], 'bad': ['Red Meat', 'Sugar', 'Fried Food']}
+        }
+    },
+    'GERD (Acid Reflux)': {
+        'title': 'GERD / Acid Reflux', 'icon': 'fa-fire', 'color': 'danger',
+        'symptoms': ['Heartburn', 'Acid Taste in Mouth', 'Difficulty Swallowing', 'Chest Pain After Eating', 'Bloating'],
+        'struggle': 'Burning sensation after meals, disrupted sleep.',
+        'daily_plan': {
+            'Phase 1': 'Elevate head while sleeping. Small meals.',
+            'Phase 2': 'Avoid trigger foods. No eating 3hrs before bed.',
+            'Phase 3': 'Weight management. Stress reduction.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Vajrasana'}, {'name': 'Pawanmuktasana'}],
+            'diet': {'good': ['Banana', 'Oatmeal', 'Green Vegetables'], 'bad': ['Spicy Food', 'Citrus', 'Coffee']}
+        }
+    },
+    'Anemia': {
+        'title': 'Anemia', 'icon': 'fa-tint', 'color': 'danger',
+        'symptoms': ['Fatigue', 'Pale Skin', 'Dizziness', 'Cold Hands and Feet', 'Brittle Nails', 'Shortness of Breath'],
+        'struggle': 'Extreme tiredness, weakness.',
+        'daily_plan': {
+            'Phase 1': 'Iron-rich diet. Vitamin C with meals.',
+            'Phase 2': 'Iron supplements (if prescribed).',
+            'Phase 3': 'Regular blood tests. Moderate exercise.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Pranayama'}, {'name': 'Shavasana'}],
+            'diet': {'good': ['Spinach', 'Lentils', 'Red Meat', 'Pomegranate'], 'bad': ['Tea with meals', 'Calcium with iron', 'Junk food']}
+        }
+    },
+    'Thyroid Disorder': {
+        'title': 'Thyroid Disorder', 'icon': 'fa-procedures', 'color': 'warning',
+        'symptoms': ['Weight Changes', 'Fatigue', 'Hair Loss', 'Mood Swings', 'Temperature Sensitivity', 'Neck Swelling'],
+        'struggle': 'Unexplained weight gain/loss, constant tiredness.',
+        'daily_plan': {
+            'Phase 1': 'Get thyroid panel tested. Medication.',
+            'Phase 2': 'Balanced iodine diet. Regular exercise.',
+            'Phase 3': 'Stress management. Regular monitoring.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Sarvangasana'}, {'name': 'Halasana'}],
+            'diet': {'good': ['Iodized Salt', 'Selenium-rich foods', 'Coconut Oil'], 'bad': ['Soy products', 'Gluten (if sensitive)', 'Processed food']}
+        }
+    },
+    'Kidney Disease': {
+        'title': 'Chronic Kidney Disease', 'icon': 'fa-kidneys', 'color': 'danger',
+        'symptoms': ['Swelling in Legs', 'Frequent Urination', 'Fatigue', 'Nausea', 'Back Pain', 'Foamy Urine'],
+        'struggle': 'Fluid retention, exhaustion.',
+        'daily_plan': {
+            'Phase 1': 'Low sodium, low potassium diet.',
+            'Phase 2': 'Monitor BP and blood sugar strictly.',
+            'Phase 3': 'Regular kidney function tests.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Ardha Matsyendrasana'}, {'name': 'Bhujangasana'}],
+            'diet': {'good': ['Cabbage', 'Bell Peppers', 'Cauliflower'], 'bad': ['High-potassium foods', 'Processed Meat', 'Excessive protein']}
+        }
+    },
+    'UTI (Urinary Tract Infection)': {
+        'title': 'Urinary Tract Infection', 'icon': 'fa-thermometer', 'color': 'warning',
+        'symptoms': ['Burning Urination', 'Frequent Urination', 'Cloudy Urine', 'Lower Abdominal Pain', 'Fever'],
+        'struggle': 'Pain and urgency disrupting daily life.',
+        'daily_plan': {
+            'Phase 1': 'Drink 3L water daily. See doctor.',
+            'Phase 2': 'Complete antibiotic course.',
+            'Phase 3': 'Probiotics. Cranberry juice.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Malasana'}, {'name': 'Supta Baddha Konasana'}],
+            'diet': {'good': ['Water', 'Cranberry', 'Probiotics'], 'bad': ['Caffeine', 'Alcohol', 'Spicy Food']}
+        }
+    },
+    'PCOS': {
+        'title': 'Polycystic Ovary Syndrome', 'icon': 'fa-female', 'color': 'warning',
+        'symptoms': ['Irregular Periods', 'Weight Gain', 'Acne', 'Hair Loss', 'Excessive Hair Growth', 'Mood Swings'],
+        'struggle': 'Hormonal imbalance, fertility concerns.',
+        'daily_plan': {
+            'Phase 1': 'Anti-inflammatory, low glycemic diet.',
+            'Phase 2': 'Regular exercise 45 mins daily.',
+            'Phase 3': 'Hormone management with doctor.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Butterfly Pose'}, {'name': 'Supta Baddha Konasana'}],
+            'diet': {'good': ['Whole grains', 'Lean protein', 'Berries'], 'bad': ['Refined carbs', 'Sugar', 'Dairy']}
+        }
+    },
+    'Bronchitis': {
+        'title': 'Bronchitis', 'icon': 'fa-lungs', 'color': 'warning',
+        'symptoms': ['Persistent Cough', 'Mucus Production', 'Chest Discomfort', 'Fatigue', 'Sore Throat', 'Body Aches'],
+        'struggle': 'Constant coughing, difficulty breathing.',
+        'daily_plan': {
+            'Phase 1': 'Rest. Steam inhalation. Fluids.',
+            'Phase 2': 'Prescribed medications. Avoid irritants.',
+            'Phase 3': 'Gradual activity increase. No smoking.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Pranayama'}, {'name': 'Ustrasana'}],
+            'diet': {'good': ['Honey', 'Ginger', 'Warm Fluids'], 'bad': ['Smoking', 'Cold Foods', 'Dairy']}
+        }
+    },
+    'Gastric Ulcer': {
+        'title': 'Gastric Ulcer', 'icon': 'fa-stomach', 'color': 'danger',
+        'symptoms': ['Stomach Pain', 'Bloating', 'Nausea', 'Loss of Appetite', 'Heartburn', 'Dark Stool'],
+        'struggle': 'Stomach pain worsened by eating.',
+        'daily_plan': {
+            'Phase 1': 'Bland diet. Small frequent meals.',
+            'Phase 2': 'Take prescribed antacids/PPIs.',
+            'Phase 3': 'Stress management. Avoid NSAIDs.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Vajrasana'}, {'name': 'Pawanmuktasana'}],
+            'diet': {'good': ['Bananas', 'Cabbage Juice', 'Probiotics'], 'bad': ['Spicy Food', 'Alcohol', 'Coffee']}
+        }
+    },
+    'Eye Strain': {
+        'title': 'Digital Eye Strain', 'icon': 'fa-eye', 'color': 'info',
+        'symptoms': ['Eye Pain', 'Blurry Vision', 'Headaches', 'Dry Eyes', 'Neck Pain', 'Difficulty Focusing'],
+        'struggle': 'Cannot work long hours on screen.',
+        'daily_plan': {
+            'Phase 1': '20-20-20 rule (every 20 min, look 20 ft away for 20 sec).',
+            'Phase 2': 'Blue light filter glasses. Proper lighting.',
+            'Phase 3': 'Eye exercises. Reduce screen time to < 6 hrs.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Trataka'}, {'name': 'Palming'}],
+            'diet': {'good': ['Carrots', 'Fish', 'Eggs'], 'bad': ['Excessive screen time', 'Dim lighting', 'Dehydration']}
+        }
+    },
+    'Dehydration': {
+        'title': 'Dehydration', 'icon': 'fa-tint', 'color': 'warning',
+        'symptoms': ['Thirst', 'Dark Urine', 'Dizziness', 'Fatigue', 'Dry Mouth', 'Headaches'],
+        'struggle': 'Weakness, dry skin, low energy.',
+        'daily_plan': {
+            'Phase 1': 'Drink 3L water daily. Electrolytes.',
+            'Phase 2': 'Eat water-rich fruits and vegetables.',
+            'Phase 3': 'Set hydration reminders.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Shavasana'}, {'name': 'Sukhasana'}],
+            'diet': {'good': ['Water', 'Watermelon', 'Coconut Water', 'Cucumber'], 'bad': ['Caffeine', 'Alcohol', 'Salty food']}
+        }
+    },
+    'Vitamin D Deficiency': {
+        'title': 'Vitamin D Deficiency', 'icon': 'fa-sun', 'color': 'warning',
+        'symptoms': ['Fatigue', 'Bone Pain', 'Muscle Weakness', 'Depression', 'Hair Loss', 'Slow Healing Wounds'],
+        'struggle': 'Tired constantly, weak bones.',
+        'daily_plan': {
+            'Phase 1': '20 mins sunlight daily (morning).',
+            'Phase 2': 'Vitamin D supplements (as prescribed).',
+            'Phase 3': 'Calcium + Vitamin D rich diet.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Surya Namaskar'}, {'name': 'Tadasana'}],
+            'diet': {'good': ['Fatty Fish', 'Egg Yolks', 'Fortified Milk'], 'bad': ['Indoor lifestyle', 'Excessive sunscreen', 'Processed food']}
+        }
+    },
+    'Sleep Apnea': {
+        'title': 'Sleep Apnea', 'icon': 'fa-bed', 'color': 'danger',
+        'symptoms': ['Loud Snoring', 'Gasping During Sleep', 'Daytime Drowsiness', 'Morning Headaches', 'Irritability'],
+        'struggle': 'Disturbed sleep, daytime fatigue.',
+        'daily_plan': {
+            'Phase 1': 'Sleep on side. Avoid alcohol before bed.',
+            'Phase 2': 'CPAP machine (if prescribed). Weight loss.',
+            'Phase 3': 'Regular sleep schedule. Throat exercises.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Pranayama'}, {'name': 'Simhasana'}],
+            'diet': {'good': ['Anti-inflammatory foods', 'Lean protein', 'Fruits'], 'bad': ['Alcohol', 'Sedatives', 'Heavy meals at night']}
+        }
+    },
+    'Pneumonia Risk': {
+        'title': 'Pneumonia', 'icon': 'fa-lungs', 'color': 'danger',
+        'symptoms': ['High Fever', 'Cough', 'Difficulty Breathing', 'Chest Pain', 'Chills', 'Fatigue'],
+        'struggle': 'Severe breathing difficulty, high fever.',
+        'daily_plan': {
+            'Phase 1': 'Immediate medical attention. Rest.',
+            'Phase 2': 'Complete antibiotic course. Fluids.',
+            'Phase 3': 'Gradual recovery. Breathing exercises.'
+        },
+        'recovery': {
+            'yoga': [{'name': 'Pranayama'}, {'name': 'Bhujangasana'}],
+            'diet': {'good': ['Warm Soup', 'Honey', 'Citrus Fruits'], 'bad': ['Cold Foods', 'Smoking', 'Dairy']}
+        }
+    },
 }
 
 # =============================================================================
@@ -911,11 +1164,11 @@ def symptom_checker():
                     pct = round((count / len(data['symptoms'])) * 100)
                     scores.append((count, pct, disease_key, matched))
 
-            # Sort by match count descending, take top 2
+            # Sort by match count descending, take top 5
             scores.sort(reverse=True)
-            top2 = scores[:2]
+            top_matches = scores[:5]
 
-            if not top2:
+            if not top_matches:
                 error_msg = 'No known condition matched your symptoms. Try selecting more symptoms.'
             else:
                 # Build water intake recommendation based on symptoms
@@ -927,7 +1180,7 @@ def symptom_checker():
                 elif any(s in selected for s in ['frequent urination','excessive thirst']):
                     water_msg = 'Drink 8–10 glasses water but monitor glucose — excessive thirst may signal diabetes.'
 
-                for (count, pct, disease_key, matched) in top2:
+                for (count, pct, disease_key, matched) in top_matches:
                     d = HEALTH_KNOWLEDGE_BASE[disease_key]
                     all_matches.append({
                         'name':      d['title'],
@@ -941,7 +1194,7 @@ def symptom_checker():
 
                 # Set primary match for tracker redirect
                 if all_matches:
-                    session['active_disease'] = top2[0][2]
+                    session['active_disease'] = top_matches[0][2]
                     diagnosis = all_matches[0]   # kept for backward compat
 
     all_symptoms = sorted(list(set([s for d in HEALTH_KNOWLEDGE_BASE.values() for s in d['symptoms']])))
@@ -967,6 +1220,10 @@ def profile():
         finally:
             conn.close()
     return render_template('profile/index.html', user=user, google_maps_key=GOOGLE_MAPS_API_KEY)
+
+@app.route('/about')
+def about():
+    return render_template('pages/about.html')
 
 @app.route('/submit-feedback', methods=['POST'])
 def submit_feedback():
@@ -1413,7 +1670,7 @@ if __name__ == '__main__':
     print(f"   {'✅' if ml_model              else '❌'} ML Model:         {'Loaded'             if ml_model              else 'Not Available'}")
     print(f"   {'✅' if BP_ESTIMATOR_AVAILABLE else '❌'} BP Estimator:     {'Ready'              if BP_ESTIMATOR_AVAILABLE else 'Not Available'}")
     print(f"   {'✅' if GOOGLE_MAPS_API_KEY   else '❌'} Google Maps:      {'Configured'         if GOOGLE_MAPS_API_KEY   else 'Not Configured'}")
-    print(f"   {'✅' if get_top_diseases      else '❌'} Disease Analyser: {'64 diseases loaded' if get_top_diseases      else 'NOT FOUND'}")
+    print(f"   {'✅' if get_top_diseases      else '❌'} Disease Analyser: {'500+ diseases loaded' if get_top_diseases      else 'NOT FOUND'}")
 
     print("\n📍 ACCESS AT:     http://localhost:5000")
     print("🔬 FIND DISEASE:  http://localhost:5000/find-disease")

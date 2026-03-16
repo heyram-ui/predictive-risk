@@ -1,0 +1,151 @@
+patient_id,date,systolic,diastolic,heart_rate,medication,notes
+P010,2025-02-09,144,69,112,Losartan,Elevated
+P015,2025-12-15,181,122,89,None,Elevated
+P016,2025-03-28,89,120,85,Amlodipine,Stage 1
+P010,2025-08-10,132,118,110,None,Normal
+P019,2025-07-28,144,76,92,Lisinopril,Stage 1
+P037,2025-03-09,190,50,111,Amlodipine,Normal
+P007,2025-10-04,151,121,74,Amlodipine,Elevated
+P002,2025-03-03,131,79,84,Lisinopril,Stage 2
+P014,2025-08-28,100,121,77,None,Stage 2
+P021,2025-09-25,92,87,83,Amlodipine,Stage 1
+P039,2025-10-17,144,92,75,Amlodipine,Stage 1
+P014,2025-05-27,119,100,114,None,Stage 2
+P047,2025-10-15,98,125,63,Amlodipine,Stage 1
+P045,2025-09-27,192,122,72,None,Stage 2
+P045,2025-09-09,158,124,117,None,Elevated
+P037,2025-11-01,124,81,120,Amlodipine,Normal
+P002,2025-12-28,138,88,100,None,Normal
+P044,2025-01-17,158,82,110,Lisinopril,Stage 2
+P047,2025-06-25,156,59,96,Lisinopril,Elevated
+P019,2025-07-03,184,106,58,Amlodipine,Elevated
+P026,2025-11-20,89,110,101,None,Stage 2
+P047,2025-07-13,158,89,95,Amlodipine,Normal
+P001,2025-10-09,170,56,116,Losartan,Stage 1
+P021,2025-06-16,152,59,117,Losartan,Stage 1
+P033,2025-10-11,116,90,82,Lisinopril,Normal
+P042,2025-07-20,158,73,96,None,Normal
+P031,2025-05-25,88,86,95,Lisinopril,Stage 1
+P033,2025-02-16,175,117,82,Lisinopril,Elevated
+P037,2025-04-19,102,79,87,Amlodipine,Stage 2
+P033,2025-10-08,163,61,81,Lisinopril,Stage 1
+P014,2025-09-26,183,85,106,None,Stage 2
+P015,2025-06-25,141,78,87,None,Elevated
+P033,2025-03-11,197,51,118,Amlodipine,Stage 2
+P039,2025-11-27,114,126,74,Amlodipine,Stage 1
+P014,2025-08-28,175,92,76,Lisinopril,Stage 2
+P030,2025-08-02,200,124,89,Amlodipine,Stage 2
+P008,2025-10-09,155,76,117,Lisinopril,Stage 2
+P027,2025-01-18,121,56,66,Lisinopril,Stage 1
+P010,2025-01-17,130,120,108,None,Elevated
+P021,2025-01-21,85,128,72,None,Elevated
+P033,2025-06-28,175,128,115,None,Stage 1
+P001,2025-05-26,173,72,70,Lisinopril,Elevated
+P042,2025-07-07,173,99,98,Amlodipine,Elevated
+P010,2025-04-24,89,109,96,Losartan,Stage 1
+P031,2025-07-01,111,112,68,Lisinopril,Stage 1
+P039,2025-03-09,128,129,95,Losartan,Stage 2
+P032,2025-05-20,94,111,78,None,Stage 2
+P023,2025-12-15,194,108,71,None,Stage 1
+P041,2025-07-04,175,110,95,Lisinopril,Elevated
+P009,2025-09-12,173,86,69,None,Normal
+P009,2025-04-11,131,120,117,None,Elevated
+P045,2025-06-19,165,77,66,None,Elevated
+P004,2025-01-21,85,73,55,Lisinopril,Stage 2
+P047,2025-09-07,135,89,69,None,Stage 2
+P031,2025-06-03,95,107,96,Amlodipine,Stage 1
+P048,2025-04-08,183,110,61,Amlodipine,Stage 1
+P021,2025-04-21,200,86,95,None,Normal
+P006,2025-08-28,93,120,87,None,Stage 2
+P004,2025-07-07,184,61,68,Amlodipine,Stage 2
+P043,2025-09-16,183,113,69,None,Elevated
+P034,2025-02-13,121,52,104,Losartan,Stage 1
+P036,2025-04-06,187,128,104,None,Stage 2
+P046,2025-09-16,92,80,86,Lisinopril,Normal
+P005,2025-11-25,181,89,114,Lisinopril,Normal
+P033,2025-01-13,128,56,106,Amlodipine,Stage 2
+P042,2025-05-06,157,123,63,Amlodipine,Elevated
+P027,2025-07-26,91,130,84,Lisinopril,Stage 1
+P027,2025-09-19,189,119,112,None,Elevated
+P020,2025-11-23,87,122,75,Losartan,Normal
+P050,2025-11-21,163,60,98,Losartan,Stage 1
+P046,2025-12-15,193,82,118,None,Stage 1
+P005,2025-05-12,141,128,55,None,Elevated
+P006,2025-03-18,117,89,72,Losartan,Normal
+P048,2025-07-13,140,111,114,Amlodipine,Stage 2
+P003,2025-09-05,92,68,64,Amlodipine,Elevated
+P038,2025-07-05,124,64,66,Lisinopril,Stage 1
+P040,2025-04-02,195,90,92,Amlodipine,Stage 1
+P022,2025-02-06,97,60,106,Amlodipine,Stage 1
+P037,2025-05-14,147,109,106,None,Stage 2
+P023,2025-07-21,90,54,75,Amlodipine,Elevated
+P028,2025-10-03,108,89,93,Losartan,Normal
+P030,2025-10-27,192,92,106,Losartan,Stage 1
+P043,2025-02-01,85,81,60,Amlodipine,Normal
+P045,2025-11-07,159,83,115,Lisinopril,Stage 2
+P041,2025-04-25,175,74,83,Losartan,Normal
+P030,2025-12-20,160,107,101,Lisinopril,Stage 2
+P047,2025-03-15,152,99,105,Lisinopril,Elevated
+P038,2025-07-05,176,93,111,Lisinopril,Stage 2
+P047,2025-10-25,85,86,60,Amlodipine,Elevated
+P039,2025-07-28,134,127,119,Amlodipine,Normal
+P037,2025-01-23,100,104,58,Losartan,Normal
+P010,2025-10-19,135,99,58,Amlodipine,Normal
+P034,2025-09-03,177,61,63,Amlodipine,Normal
+P043,2025-12-27,166,94,114,Lisinopril,Normal
+P011,2025-10-17,94,99,74,Lisinopril,Stage 1
+P025,2025-02-09,97,83,58,Lisinopril,Stage 2
+P013,2025-02-15,182,88,120,Losartan,Stage 1
+P044,2025-12-21,142,90,97,None,Stage 1
+P021,2025-04-01,120,60,100,Lisinopril,Stage 2
+P005,2025-09-17,174,78,65,Amlodipine,Stage 2
+P004,2025-12-26,160,84,74,Amlodipine,Elevated
+P022,2025-06-11,92,121,96,Losartan,Normal
+P003,2025-05-22,116,115,83,None,Stage 1
+P036,2025-08-22,94,65,68,Lisinopril,Stage 2
+P047,2025-08-04,169,56,118,None,Stage 1
+P001,2025-10-09,148,75,61,None,Stage 1
+P009,2025-05-10,133,118,67,None,Stage 2
+P007,2025-05-09,101,127,82,Losartan,Stage 1
+P013,2025-06-01,100,110,91,None,Elevated
+P005,2025-03-12,123,83,107,Amlodipine,Stage 2
+P021,2025-02-20,171,128,89,Amlodipine,Normal
+P006,2025-02-12,164,111,105,Lisinopril,Stage 1
+P021,2025-07-15,115,82,55,None,Elevated
+P036,2025-12-18,146,107,96,Amlodipine,Normal
+P008,2025-11-26,124,67,94,Losartan,Normal
+P025,2025-08-28,136,117,116,Lisinopril,Stage 1
+P028,2025-03-22,148,108,92,Lisinopril,Elevated
+P046,2025-04-14,149,114,58,None,Stage 2
+P022,2025-12-19,160,61,102,None,Stage 1
+P043,2025-07-21,166,123,57,Amlodipine,Normal
+P001,2025-06-23,121,82,114,Amlodipine,Elevated
+P030,2025-03-21,195,67,57,None,Elevated
+P005,2025-04-06,176,127,79,Lisinopril,Elevated
+P001,2025-01-12,98,111,99,None,Elevated
+P045,2025-09-21,156,114,91,Lisinopril,Stage 2
+P038,2025-12-16,192,123,63,Lisinopril,Stage 2
+P049,2025-12-19,120,116,62,Losartan,Stage 1
+P049,2025-01-10,95,67,70,Amlodipine,Normal
+P018,2025-08-23,141,56,111,None,Stage 2
+P018,2025-11-17,102,58,95,Losartan,Stage 1
+P016,2025-08-26,91,68,113,Amlodipine,Stage 2
+P017,2025-06-12,161,121,112,Losartan,Stage 2
+P019,2025-03-13,197,102,114,Lisinopril,Normal
+P018,2025-03-05,91,129,67,Lisinopril,Normal
+P021,2025-09-09,147,112,60,Amlodipine,Normal
+P021,2025-10-23,154,125,72,Lisinopril,Elevated
+P011,2025-04-28,188,102,114,None,Stage 1
+P002,2025-11-20,171,94,106,Amlodipine,Stage 2
+P021,2025-11-01,143,105,93,None,Stage 1
+P032,2025-05-17,178,97,118,None,Normal
+P050,2025-11-21,159,58,89,None,Stage 1
+P027,2025-11-23,115,81,68,Lisinopril,Normal
+P037,2025-12-07,86,63,56,Losartan,Normal
+P009,2025-07-19,198,80,117,None,Normal
+P027,2025-12-20,148,113,113,Amlodipine,Normal
+P004,2025-05-10,167,117,107,Losartan,Stage 1
+P010,2025-12-16,194,94,67,Lisinopril,Stage 1
+P007,2025-05-08,157,78,76,Lisinopril,Stage 1
+P038,2025-08-02,111,128,80,Lisinopril,Stage 1
+P013,2025-09-20,180,55,108,None,Elevated

@@ -1,0 +1,151 @@
+age,creatinine,bun,gfr,urine_protein,blood_pressure,diabetes,kidney_stage
+81,2.6,8,115,Normal,156/94,Yes,Stage 2
+55,4.9,46,98,Normal,171/70,No,Stage 3
+68,1.9,33,73,High,113/89,Yes,Normal
+78,2.1,23,99,Trace,126/65,No,Stage 4
+26,1.3,6,89,Normal,136/81,No,Stage 5
+30,4.4,9,69,Moderate,125/71,Yes,Stage 5
+74,2.5,40,109,High,103/83,Yes,Stage 2
+33,4.3,50,39,High,127/99,No,Stage 1
+61,2.9,42,41,Moderate,142/65,No,Stage 1
+62,3.6,37,80,Normal,156/63,Yes,Normal
+42,5.6,25,116,Trace,148/58,No,Normal
+64,3.5,23,54,Moderate,95/101,No,Stage 3
+37,3.9,9,57,High,135/55,Yes,Stage 3
+82,5.6,40,120,Moderate,95/98,Yes,Stage 3
+45,1.0,34,21,Trace,121/66,Yes,Stage 1
+22,2.3,29,94,High,136/59,Yes,Stage 5
+81,4.6,12,13,Normal,92/78,No,Stage 2
+59,2.4,30,44,Normal,162/97,No,Stage 2
+42,5.5,43,66,Moderate,130/91,Yes,Stage 2
+62,4.7,16,67,High,157/82,Yes,Stage 4
+38,1.5,20,35,Trace,110/66,Yes,Stage 1
+24,3.2,11,37,Trace,90/99,No,Normal
+53,4.8,34,73,Normal,137/76,Yes,Stage 1
+25,2.5,22,36,Trace,163/65,No,Stage 3
+78,0.9,50,113,High,153/57,Yes,Normal
+85,0.9,38,105,Normal,121/81,Yes,Normal
+47,1.4,26,91,Moderate,145/80,Yes,Normal
+40,4.9,26,103,Normal,148/61,Yes,Normal
+48,5.0,45,41,Trace,167/60,Yes,Stage 1
+56,3.1,13,61,Moderate,137/66,No,Stage 5
+40,3.1,45,19,Trace,168/99,Yes,Stage 1
+20,4.3,18,56,Moderate,136/85,Yes,Stage 1
+56,5.6,46,14,High,158/98,No,Stage 5
+49,5.1,38,33,Moderate,111/94,No,Normal
+60,3.9,41,119,Trace,170/101,Yes,Stage 2
+77,4.8,38,97,Normal,175/58,No,Stage 4
+23,5.4,26,74,Moderate,139/105,No,Stage 5
+42,2.6,15,73,High,145/92,Yes,Normal
+66,2.2,50,92,Trace,166/89,Yes,Stage 4
+39,5.7,37,93,Moderate,100/65,No,Stage 1
+64,1.8,22,48,High,111/55,No,Stage 1
+48,2.5,24,67,Moderate,114/69,No,Stage 5
+77,0.9,30,43,High,147/98,No,Stage 4
+42,3.1,7,70,Trace,119/75,Yes,Normal
+48,2.0,30,48,Trace,128/71,No,Stage 3
+21,3.9,47,98,Moderate,92/103,No,Stage 3
+60,2.2,27,11,Trace,127/85,No,Normal
+60,3.1,31,92,High,178/105,No,Stage 3
+43,4.7,19,54,Normal,123/83,Yes,Stage 1
+70,3.4,30,67,Moderate,153/92,No,Stage 3
+77,3.5,36,75,Moderate,140/57,No,Normal
+43,1.0,33,55,Trace,168/92,Yes,Stage 2
+82,5.2,40,66,Normal,170/88,No,Stage 4
+59,5.3,10,34,Normal,132/66,No,Stage 4
+40,1.5,20,36,Normal,150/81,Yes,Normal
+76,5.6,39,77,Trace,139/108,Yes,Stage 5
+78,2.5,5,96,High,179/73,Yes,Stage 2
+42,4.4,48,97,High,137/81,No,Normal
+26,2.2,43,34,High,161/69,Yes,Stage 4
+71,2.8,32,41,Normal,170/69,No,Stage 3
+73,1.8,14,114,Trace,144/105,No,Stage 1
+27,4.6,13,45,Trace,97/89,No,Stage 2
+21,5.4,23,55,Normal,161/73,No,Stage 1
+34,3.3,39,13,Trace,137/79,Yes,Stage 2
+29,3.9,32,111,Trace,167/103,Yes,Stage 4
+72,2.3,38,19,Trace,163/74,Yes,Stage 1
+48,3.1,37,90,Trace,172/103,No,Stage 3
+36,3.9,5,32,High,172/97,Yes,Stage 2
+36,3.1,19,40,High,166/88,No,Stage 1
+64,0.7,48,109,Moderate,108/89,No,Stage 5
+27,2.0,15,92,Normal,107/88,Yes,Stage 3
+32,4.0,9,71,Trace,130/59,No,Stage 1
+67,0.7,43,42,Moderate,94/96,Yes,Stage 4
+36,4.0,31,21,Moderate,145/108,Yes,Stage 2
+20,2.5,15,54,Moderate,168/60,Yes,Stage 3
+23,4.7,19,90,Normal,177/76,No,Stage 2
+23,1.5,14,109,Moderate,115/60,Yes,Stage 4
+76,2.9,23,10,Trace,141/79,No,Stage 3
+64,1.0,28,108,High,176/55,Yes,Stage 3
+33,1.2,48,64,High,169/110,No,Stage 2
+25,3.5,26,99,Normal,99/87,No,Stage 2
+44,2.6,20,16,Moderate,153/102,Yes,Stage 3
+23,2.5,33,35,High,122/105,No,Stage 2
+24,3.0,34,66,Moderate,180/70,Yes,Normal
+72,1.7,11,118,Normal,136/95,Yes,Stage 4
+42,2.9,35,117,Moderate,179/64,Yes,Stage 3
+82,4.7,22,105,High,107/57,No,Stage 4
+29,5.8,22,78,High,154/78,Yes,Normal
+42,5.7,19,59,High,134/91,No,Stage 5
+29,2.6,23,13,Trace,110/109,Yes,Stage 1
+20,5.7,12,105,Normal,121/88,No,Stage 4
+59,2.5,48,47,High,139/76,Yes,Stage 4
+40,1.4,13,27,Trace,152/99,Yes,Stage 5
+82,5.3,26,38,Normal,132/85,No,Stage 4
+42,0.6,15,58,Moderate,154/66,No,Stage 3
+43,4.4,39,74,High,100/72,No,Stage 4
+31,5.2,27,92,Moderate,121/62,No,Normal
+36,1.9,9,89,Moderate,153/96,Yes,Stage 2
+61,4.8,5,34,Normal,104/58,No,Stage 2
+56,2.8,32,97,Moderate,111/103,Yes,Stage 3
+68,5.3,41,58,Trace,95/102,Yes,Stage 4
+48,3.5,5,99,High,171/101,No,Stage 3
+74,4.9,44,99,Normal,113/72,Yes,Stage 2
+35,4.9,35,56,Moderate,176/93,Yes,Stage 5
+84,4.7,35,31,Moderate,169/92,No,Normal
+74,0.7,8,49,Moderate,151/69,Yes,Stage 1
+35,0.7,36,109,High,95/83,No,Stage 4
+28,1.1,40,44,Trace,102/91,No,Stage 2
+77,5.7,32,112,Trace,103/70,Yes,Stage 4
+47,2.2,41,72,Normal,107/106,Yes,Stage 2
+65,1.6,40,115,High,94/93,Yes,Stage 5
+42,1.3,24,15,Moderate,154/99,No,Stage 1
+48,1.3,9,56,High,91/84,No,Stage 3
+53,1.2,22,113,Moderate,171/108,No,Stage 3
+37,5.9,24,116,Trace,112/99,No,Stage 5
+42,3.4,23,21,High,108/60,Yes,Stage 2
+50,3.3,35,19,Normal,149/105,No,Stage 5
+30,2.7,47,118,Trace,144/65,No,Normal
+54,4.4,5,77,Moderate,94/108,No,Stage 3
+51,5.7,14,30,High,115/105,Yes,Stage 3
+57,3.7,34,87,Moderate,151/107,No,Stage 5
+32,5.2,15,38,Normal,129/91,Yes,Stage 1
+63,1.9,31,115,Trace,108/70,Yes,Stage 4
+71,3.5,22,62,Normal,113/76,No,Normal
+53,0.7,18,14,Trace,100/104,No,Stage 2
+51,5.9,40,91,High,171/88,Yes,Normal
+63,1.4,15,57,High,134/57,Yes,Stage 1
+36,2.0,39,53,Trace,135/105,Yes,Stage 2
+80,5.2,8,118,Normal,173/78,Yes,Stage 2
+20,3.5,45,25,Trace,124/86,Yes,Stage 5
+77,2.4,19,87,High,119/88,Yes,Stage 3
+68,5.4,33,67,High,147/108,Yes,Stage 2
+84,1.7,26,55,Moderate,92/95,Yes,Stage 1
+82,4.6,6,84,Normal,145/74,Yes,Stage 4
+36,2.3,6,111,Moderate,174/85,Yes,Stage 1
+24,2.6,25,80,High,176/65,Yes,Stage 2
+51,3.3,6,57,Trace,146/65,No,Normal
+51,3.8,42,105,Trace,135/66,No,Stage 1
+22,5.2,36,22,Moderate,165/82,No,Normal
+54,1.3,26,33,High,90/109,No,Stage 4
+21,3.4,33,60,Trace,156/73,Yes,Stage 4
+57,2.6,25,44,Moderate,93/81,No,Stage 5
+37,4.9,49,30,Normal,113/99,Yes,Stage 3
+54,5.7,47,19,Trace,95/65,Yes,Stage 2
+70,2.5,49,39,Normal,115/92,Yes,Stage 3
+30,2.6,11,22,Moderate,97/93,Yes,Normal
+21,3.0,29,41,High,121/101,Yes,Stage 2
+78,0.8,13,89,Moderate,133/55,No,Normal
+83,1.8,6,107,Trace,112/90,Yes,Stage 2
+85,3.0,14,29,Normal,136/90,Yes,Normal

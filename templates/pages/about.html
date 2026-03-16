@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+body { font-family: 'Inter', sans-serif !important; }
+
+.about-hero {
+    background: linear-gradient(135deg, #0a0e1a, #0d2137, #0d6e6e);
+    color: white; padding: 80px 0 50px; position: relative; overflow: hidden;
+}
+.about-hero::before {
+    content: ''; position: absolute; top: -50%; right: -20%; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(52,211,153,0.15), transparent 70%);
+    border-radius: 50%;
+}
+.about-hero h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 16px; position: relative; }
+.about-hero p { color: rgba(255,255,255,.7); font-size: 1.1rem; max-width: 600px; position: relative; }
+
+.about-body { padding: 60px 0 80px; background: #f8fafc; }
+
+.about-card {
+    background: white; border-radius: 20px; padding: 36px; margin-bottom: 24px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.06); border: 1px solid #e2e8f0;
+}
+.about-card h3 { font-weight: 800; color: #0d1b2a; margin-bottom: 16px; font-size: 1.3rem; }
+.about-card h3 i { color: #0d6e6e; margin-right: 10px; }
+.about-card p, .about-card li { color: #475569; line-height: 1.8; font-size: 0.95rem; }
+.about-card ul { padding-left: 20px; }
+
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.tech-item {
+    background: #f0fdfa; border: 1px solid #d1fae5; border-radius: 14px;
+    padding: 16px; text-align: center; font-weight: 600; color: #0d6e6e;
+    font-size: 14px; transition: all 0.2s;
+}
+.tech-item:hover { transform: translateY(-3px); box-shadow: 0 4px 16px rgba(13,110,110,.15); }
+.tech-item i { display: block; font-size: 1.5rem; margin-bottom: 8px; color: #10b981; }
+
+.workflow-step {
+    display: flex; gap: 18px; margin-bottom: 20px; align-items: flex-start;
+}
+.step-num {
+    width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px;
+    background: linear-gradient(135deg, #0d6e6e, #10b981); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem;
+}
+.step-content h5 { font-weight: 700; color: #0d1b2a; margin-bottom: 4px; font-size: 1rem; }
+.step-content p { color: #64748b; font-size: 0.9rem; margin: 0; }
+
+.disclaimer-box {
+    background: linear-gradient(135deg, #fef3c7, #fffbeb);
+    border: 1px solid #fde68a; border-radius: 16px; padding: 24px;
+    color: #92400e; font-size: 14px; line-height: 1.8;
+}
+.disclaimer-box i { color: #f59e0b; margin-right: 8px; }
+</style>
+
+<div class="about-hero">
+    <div class="container">
+        <h1><i class="fas fa-heartbeat me-2" style="color:#34d399"></i>About Health Risk</h1>
+        <p>A Machine Learning-powered health risk prediction platform that analyzes your daily lifestyle data to predict potential health risks and provide personalized recommendations.</p>
+    </div>
+</div>
+
+<div class="about-body">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <!-- What This Project Does -->
+                <div class="about-card">
+                    <h3><i class="fas fa-bullseye"></i>What This Project Does</h3>
+                    <p>Health Risk is a comprehensive health risk prediction web application that uses Machine Learning and rule-based analysis to:</p>
+                    <ul>
+                        <li><strong>Predict diseases</strong> — Analyzes 500+ potential health conditions based on your symptoms, vitals, and lifestyle data</li>
+                        <li><strong>Assess health risks</strong> — Uses a Random Forest ML model trained on 70,000+ medical records to calculate personalized risk scores</li>
+                        <li><strong>Check symptoms</strong> — Match your symptoms against 25+ disease profiles with 3-phase recovery plans</li>
+                        <li><strong>Find nearby care</strong> — Locate hospitals and pharmacies near you using Google Maps integration</li>
+                        <li><strong>Track recovery</strong> — Log daily health progress, diet quality, and symptom severity over time</li>
+                        <li><strong>Generate reports</strong> — Download branded PDF health reports to share with your doctor</li>
+                        <li><strong>Emergency alerts</strong> — Automatically notify emergency contacts when risk scores are critically high</li>
+                    </ul>
+                </div>
+
+                <!-- How It Works -->
+                <div class="about-card">
+                    <h3><i class="fas fa-cogs"></i>How It Works</h3>
+                    <div class="workflow-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <h5>You Share Your Daily Routine</h5>
+                            <p>Enter your sleep hours, physical activity, stress level, BMI, blood pressure, screen time, and other lifestyle data into the assessment form.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <h5>Machine Learning Analyzes Your Data</h5>
+                            <p>Our RandomForest model (trained on real medical datasets) processes your input alongside 500+ rule-based disease conditions to calculate risk probabilities for each condition.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <h5>You Get Personalized Results</h5>
+                            <p>Receive a comprehensive health report with: overall risk score, top disease predictions with confidence levels, personalized lifestyle recommendations, and a downloadable PDF report.</p>
+                        </div>
+                    </div>
+                    <div class="workflow-step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <h5>Track & Improve Over Time</h5>
+                            <p>Use the daily tracker to log your recovery progress, diet quality, and symptom severity. View 7-day trend charts to see how you're improving.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datasets -->
+                <div class="about-card">
+                    <h3><i class="fas fa-database"></i>Datasets & Training Data</h3>
+                    <p>This project uses <strong>12+ real-world health datasets</strong> covering:</p>
+                    <ul>
+                        <li>Diabetes risk factors and blood sugar patterns</li>
+                        <li>Cardiovascular disease indicators</li>
+                        <li>Sleep quality and insomnia metrics</li>
+                        <li>Mental health scores (stress, anxiety, depression)</li>
+                        <li>BMI and obesity pattern analysis</li>
+                        <li>Blood pressure monitoring logs</li>
+                        <li>Respiratory health markers</li>
+                        <li>Nutrition and diet quality assessments</li>
+                        <li>Physical activity and exercise tracking</li>
+                        <li>Kidney function and liver health indicators</li>
+                        <li>Bone density and musculoskeletal health</li>
+                    </ul>
+                    <p>The ML model achieves <strong>~98% accuracy</strong> on test data using a RandomForest classifier with stratified cross-validation.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Tech Stack -->
+                <div class="about-card">
+                    <h3><i class="fas fa-layer-group"></i>Technology Stack</h3>
+                    <div class="tech-grid">
+                        <div class="tech-item"><i class="fab fa-python"></i>Python / Flask</div>
+                        <div class="tech-item"><i class="fas fa-brain"></i>Scikit-Learn</div>
+                        <div class="tech-item"><i class="fas fa-database"></i>PostgreSQL</div>
+                        <div class="tech-item"><i class="fas fa-map-marker-alt"></i>Google Maps</div>
+                        <div class="tech-item"><i class="fas fa-file-pdf"></i>FPDF2</div>
+                        <div class="tech-item"><i class="fab fa-bootstrap"></i>Bootstrap 5</div>
+                        <div class="tech-item"><i class="fas fa-chart-bar"></i>Pandas / NumPy</div>
+                        <div class="tech-item"><i class="fas fa-envelope"></i>Flask-Mail</div>
+                    </div>
+                </div>
+
+                <!-- Key Features -->
+                <div class="about-card">
+                    <h3><i class="fas fa-star"></i>Key Features</h3>
+                    <ul>
+                        <li>500+ disease risk analysis</li>
+                        <li>25+ symptom checker profiles</li>
+                        <li>ML-powered risk scoring</li>
+                        <li>PDF report generation</li>
+                        <li>Google Maps hospital finder</li>
+                        <li>Daily health tracking</li>
+                        <li>Emergency email alerts</li>
+                        <li>BMI & BP calculators</li>
+                        <li>Health encyclopedia</li>
+                        <li>Progressive Web App</li>
+                        <li>Mobile-responsive design</li>
+                        <li>Password reset with OTP</li>
+                    </ul>
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="disclaimer-box">
+                    <p class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Medical Disclaimer:</strong> This application is designed for <strong>educational and informational purposes only</strong>. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider for medical concerns.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

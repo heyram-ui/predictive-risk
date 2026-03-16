@@ -1,35 +1,8 @@
 # disease_predictor.py
+# Imports 501 disease rules from disease_rules.py
 
-# Included directly to avoid relative ImportError crashes
-DISEASE_RULES = {
-    "Type 2 Diabetes": {
-        "category": "Metabolic",
-        "icon": "fa-tint",
-        "conditions": [
-            {"field": "glucose", "operator": ">=", "value": 125, "weight": 5},
-            {"field": "bmi", "operator": ">=", "value": 30, "weight": 3},
-            {"field": "age", "operator": ">", "value": 45, "weight": 2}
-        ]
-    },
-    "Hypertension": {
-        "category": "Cardiovascular",
-        "icon": "fa-heartbeat",
-        "conditions": [
-            {"field": "bp_sys", "operator": ">=", "value": 130, "weight": 4},
-            {"field": "bp_dias", "operator": ">=", "value": 85, "weight": 3},
-            {"field": "stress_level", "operator": "==", "value": "High", "weight": 2}
-        ]
-    },
-    "Sleep Apnea": {
-        "category": "Sleep & Neuro",
-        "icon": "fa-bed",
-        "conditions": [
-            {"field": "bmi", "operator": ">=", "value": 30, "weight": 4},
-            {"field": "sleep_hours", "operator": "<=", "value": 5, "weight": 3}
-        ]
-    }
-    # Add the rest of your 64 diseases here...
-}
+from disease_prediction.disease_rules import DISEASE_RULES
+
 
 def calculate_disease_probabilities(user_data):
     results = []
@@ -41,7 +14,7 @@ def calculate_disease_probabilities(user_data):
 
         for condition in disease_info['conditions']:
             field    = condition['field']
-            operator = condition['operator']
+            op       = condition.get('op', condition.get('operator', ''))
             value    = condition['value']
             weight   = condition['weight']
 
@@ -52,11 +25,16 @@ def calculate_disease_probabilities(user_data):
                 continue
 
             matched = False
-            if operator == ">"  and user_value > value:  matched = True
-            if operator == "<"  and user_value < value:  matched = True
-            if operator == ">=" and user_value >= value: matched = True
-            if operator == "<=" and user_value <= value: matched = True
-            if operator == "==" and user_value == value: matched = True
+            try:
+                if op == ">"       and float(user_value) > float(value):   matched = True
+                elif op == "<"     and float(user_value) < float(value):   matched = True
+                elif op == ">="    and float(user_value) >= float(value):  matched = True
+                elif op == "<="    and float(user_value) <= float(value):  matched = True
+                elif op == "=="    and str(user_value) == str(value):      matched = True
+                elif op == "between" and isinstance(value, list) and len(value) == 2:
+                    matched = float(value[0]) <= float(user_value) <= float(value[1])
+            except (ValueError, TypeError):
+                continue
 
             if matched:
                 matched_weight += weight

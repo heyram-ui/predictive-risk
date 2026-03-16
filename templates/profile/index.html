@@ -40,29 +40,59 @@
                 </div>
                 
                 <div id="mapStatus" class="bg-light px-4 py-2 small text-muted border-bottom">
+                    {% if google_maps_key %}
                     <i class="fas fa-info-circle me-1"></i> Press "Find Hospitals" to locate services.
+                    {% else %}
+                    <i class="fas fa-exclamation-triangle me-1 text-warning"></i> Google Maps API key not configured. Add <code>GOOGLE_MAPS_API_KEY</code> to your <code>.env</code> file.
+                    {% endif %}
                 </div>
 
-                <div id="map" style="height: 500px; width: 100%;"></div>
+                <div id="map" style="height: 500px; width: 100%; background: #f0f4f8; display: flex; align-items: center; justify-content: center;">
+                    <div class="text-center text-muted" id="mapPlaceholder">
+                        <i class="fas fa-map-marked-alt d-block mb-2" style="font-size: 3rem; color: #cbd5e1;"></i>
+                        <p class="mb-0">Click <strong>Find Hospitals</strong> to load the map</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<script 
-    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&libraries=places&callback=initMap" 
-    async defer>
-</script>
-
+{% if google_maps_key %}
 <script>
     let map;
-    let service;
-    let infowindow;
+    let mapLoaded = false;
 
-    function initMap() {
-        if (navigator.geolocation) {
-            document.getElementById('mapStatus').innerHTML = '<span class="text-primary fw-bold">Locating you...</span>';
-            
+    function loadGoogleMapsScript() {
+        return new Promise((resolve, reject) => {
+            if (window.google && window.google.maps) {
+                resolve();
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = "https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&libraries=places";
+            script.async = true;
+            script.defer = true;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Failed to load Google Maps'));
+            document.head.appendChild(script);
+        });
+    }
+
+    async function initMap() {
+        const statusEl = document.getElementById('mapStatus');
+        const placeholder = document.getElementById('mapPlaceholder');
+
+        if (!navigator.geolocation) {
+            statusEl.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Geolocation not supported by your browser.</span>';
+            return;
+        }
+
+        statusEl.innerHTML = '<span class="text-primary fw-bold"><i class="fas fa-spinner fa-spin me-1"></i>Loading map & locating you...</span>';
+
+        try {
+            await loadGoogleMapsScript();
+
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const userPos = {
@@ -70,47 +100,51 @@
                         lng: position.coords.longitude,
                     };
 
+                    if (placeholder) placeholder.style.display = 'none';
+
                     map = new google.maps.Map(document.getElementById("map"), {
                         center: userPos,
                         zoom: 14,
-                        mapId: "DEMO_MAP_ID"
                     });
 
                     new google.maps.Marker({
                         position: userPos,
                         map: map,
                         title: "You are here",
-                        icon: "http://googleusercontent.com/maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                        icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
                     });
 
-                    document.getElementById('mapStatus').innerHTML = '✅ Location Found. Searching for hospitals...';
+                    statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Location found. Searching for hospitals...';
                     findHospitals(userPos);
                 },
-                () => {
-                    handleLocationError(true, map.getCenter());
-                }
+                (error) => {
+                    statusEl.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Location access denied. Please allow location in browser settings.</span>';
+                },
+                { timeout: 10000, enableHighAccuracy: true }
             );
-        } else {
-            handleLocationError(false, map.getCenter());
+        } catch (err) {
+            statusEl.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Failed to load Google Maps. Check your API key.</span>';
         }
     }
 
     function findHospitals(location) {
         const request = {
             location: location,
-            radius: '5000', // 5km
+            radius: '5000',
             type: ['hospital']
         };
 
-        service = new google.maps.places.PlacesService(map);
+        const service = new google.maps.places.PlacesService(map);
         service.nearbySearch(request, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                document.getElementById('mapStatus').innerHTML = `✅ Found ${results.length} hospitals nearby.`;
+                document.getElementById('mapStatus').innerHTML = 
+                    '<i class="fas fa-check-circle text-success me-1"></i> Found ' + results.length + ' hospitals nearby.';
                 for (let i = 0; i < results.length; i++) {
                     createMarker(results[i]);
                 }
             } else {
-                document.getElementById('mapStatus').innerHTML = '⚠️ No hospitals found nearby.';
+                document.getElementById('mapStatus').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle text-warning me-1"></i> No hospitals found nearby. Try a different area.';
             }
         });
     }
@@ -137,12 +171,13 @@
             infowindow.open(map, marker);
         });
     }
-
-    function handleLocationError(browserHasGeolocation, pos) {
-        const info = browserHasGeolocation
-            ? "Error: The Geolocation service failed."
-            : "Error: Your browser doesn't support geolocation.";
-        document.getElementById('mapStatus').innerHTML = `<span class="text-danger">${info}</span>`;
+</script>
+{% else %}
+<script>
+    function initMap() {
+        document.getElementById('mapStatus').innerHTML = 
+            '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Google Maps API key not configured. Contact the administrator.</span>';
     }
 </script>
+{% endif %}
 {% endblock %}
