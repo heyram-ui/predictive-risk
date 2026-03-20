@@ -759,7 +759,7 @@ def dashboard():
     )
 
 # =============================================================================
-# ROUTES — FIND DISEASE  (64-Disease Analyser)
+# ROUTES — FIND DISEASE  (500+ Disease Analyser)
 # =============================================================================
 # ✅ BOTH hyphen AND underscore routes — covers all link formats
 @app.route('/find-disease', methods=['GET'])
@@ -767,7 +767,7 @@ def dashboard():
 def find_disease():
     """
     GET /find-disease  OR  /find_disease
-    Shows the 64-disease analysis input form.
+    Shows the 500+ disease analysis input form.
     Template must be at:  templates/find_disease.html
     """
     if 'user_id' not in session:
@@ -1600,6 +1600,13 @@ def download_report():
         import traceback; traceback.print_exc()
         flash(f"Report generation failed: {str(e)}", "danger")
         return redirect(url_for('dashboard'))
+
+# =============================================================================
+# OFFLINE PAGE — for PWA fallback
+# =============================================================================
+@app.route('/offline')
+def offline():
+    return render_template('offline.html')
 
 # =============================================================================
 # ERROR HANDLERS — inline HTML so they NEVER fail even if template is missing

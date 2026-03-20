@@ -120,10 +120,31 @@ body { font-family: 'Inter', sans-serif !important; }
                 <div class="about-card">
                     <h3><i class="fas fa-database"></i>Datasets & Training Data</h3>
                     <p>This project uses <strong>12+ real-world health datasets</strong> covering:</p>
+
+                    <!-- Dataset Statistics Grid -->
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px;">
+                        <div style="background:linear-gradient(135deg,#f0fdfa,#e8f5f5);border-radius:14px;padding:16px;text-align:center;">
+                            <div style="font-size:1.8rem;font-weight:900;color:#0d6e6e;">70,000+</div>
+                            <div style="font-size:12px;color:#64748b;font-weight:600;">Medical Records</div>
+                        </div>
+                        <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border-radius:14px;padding:16px;text-align:center;">
+                            <div style="font-size:1.8rem;font-weight:900;color:#2563eb;">500+</div>
+                            <div style="font-size:12px;color:#64748b;font-weight:600;">Disease Rules</div>
+                        </div>
+                        <div style="background:linear-gradient(135deg,#fef3c7,#fffbeb);border-radius:14px;padding:16px;text-align:center;">
+                            <div style="font-size:1.8rem;font-weight:900;color:#d97706;">1,000+</div>
+                            <div style="font-size:12px;color:#64748b;font-weight:600;">Patient Records</div>
+                        </div>
+                        <div style="background:linear-gradient(135deg,#fce7f3,#fdf2f8);border-radius:14px;padding:16px;text-align:center;">
+                            <div style="font-size:1.8rem;font-weight:900;color:#db2777;">98%</div>
+                            <div style="font-size:12px;color:#64748b;font-weight:600;">ML Accuracy</div>
+                        </div>
+                    </div>
+
                     <ul>
-                        <li>Diabetes risk factors and blood sugar patterns</li>
-                        <li>Cardiovascular disease indicators</li>
-                        <li>Sleep quality and insomnia metrics</li>
+                        <li>Diabetes risk factors and blood sugar patterns (1,000+ patient records)</li>
+                        <li>Cardiovascular disease indicators (heart_data.csv — 2.9 MB)</li>
+                        <li>Sleep quality and insomnia metrics (sleep_data.csv)</li>
                         <li>Mental health scores (stress, anxiety, depression)</li>
                         <li>BMI and obesity pattern analysis</li>
                         <li>Blood pressure monitoring logs</li>
@@ -132,8 +153,9 @@ body { font-family: 'Inter', sans-serif !important; }
                         <li>Physical activity and exercise tracking</li>
                         <li>Kidney function and liver health indicators</li>
                         <li>Bone density and musculoskeletal health</li>
+                        <li>Comprehensive daily routine health data (comprehensive_health_data.csv)</li>
                     </ul>
-                    <p>The ML model achieves <strong>~98% accuracy</strong> on test data using a RandomForest classifier with stratified cross-validation.</p>
+                    <p>The ML model achieves <strong>~98% accuracy</strong> on test data using a RandomForest classifier with stratified cross-validation. The 500+ Disease Analyser uses rule-based medical conditions derived from WHO guidelines and clinical research databases.</p>
                 </div>
             </div>
 

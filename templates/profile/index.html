@@ -1,183 +1,286 @@
 {% extends "base.html" %}
-
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+body { font-family:'Inter',sans-serif!important; }
+
+.avatar-circle { width:80px;height:80px;background:linear-gradient(135deg,#2563eb,#3b82f6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:2rem;font-weight:800;box-shadow:0 4px 20px rgba(37,99,235,.35); }
+.health-card { background:white;border-radius:20px;padding:28px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid #e2e8f0; }
+
+/* Nearby items */
+.nearby-results { max-height:290px;overflow-y:auto;padding:0 4px; }
+.nearby-results::-webkit-scrollbar { width:4px; }
+.nearby-results::-webkit-scrollbar-thumb { background:#e2e8f0;border-radius:3px; }
+.nr-item { display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid #e8ecf0;margin-bottom:8px;transition:all .2s;cursor:pointer; }
+.nr-item:hover { border-color:#2563eb;background:#f8fafc; }
+.nr-item.active { border-color:#2563eb;background:#eff6ff; }
+.nr-icon { width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0; }
+.nr-icon.h { background:rgba(239,68,68,.1);color:#ef4444; }
+.nr-icon.p { background:rgba(16,185,129,.1);color:#10b981; }
+.nr-name { font-weight:600;font-size:12px;color:#0d1b2a;margin-bottom:2px; }
+.nr-sub  { font-size:11px;color:#94a3b8; }
+.nr-dist { font-size:11px;font-weight:600;color:#1e40af;background:#eff6ff;padding:2px 8px;border-radius:12px;white-space:nowrap;margin-left:auto;flex-shrink:0; }
+.btn-route-sm { padding:4px 10px;border:none;border-radius:8px;background:#2563eb;color:white;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0; }
+.btn-route-sm.p { background:#10b981; }
+
+#map { height:340px;width:100%;border-radius:12px;border:1px solid #e2e8f0; }
+.map-status-p { padding:8px 12px;font-size:12px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;gap:8px; }
+.map-status-p.info    { background:#eff6ff;color:#1e40af; }
+.map-status-p.success { background:#f0fdf4;color:#15803d; }
+.map-status-p.error   { background:#fef2f2;color:#dc2626; }
+</style>
+
 <div class="container py-5">
-    <div class="row g-4">
-        
-        <div class="col-lg-4">
-            <div class="health-card text-center h-100">
-                <div class="avatar-circle mb-3 mx-auto">
-                    {{ user[1][0] if user else 'U' }}
-                </div>
-                <h3 class="fw-bold">{{ user[1] if user else 'Guest User' }}</h3>
-                <p class="text-muted">{{ user[2] if user else 'No Email' }}</p>
-                <hr class="opacity-10 my-4">
-                
-                <div class="text-start px-3">
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="fw-bold text-muted">Age</span>
-                        <span class="fw-bold">{{ user[4] if user else 'N/A' }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="fw-bold text-muted">Emergency</span>
-                        <span class="fw-bold text-danger">{{ user[5] if user else 'Not Set' }}</span>
-                    </div>
-                </div>
+  <div class="row g-4">
 
-                <div class="mt-5 d-grid gap-2">
-                    <a href="/logout" class="btn btn-danger btn-pill">Logout</a>
-                </div>
-            </div>
+    <!-- LEFT: Profile Card -->
+    <div class="col-lg-4">
+      <div class="health-card text-center h-100">
+        <div class="avatar-circle mb-3 mx-auto">
+          {{ user[1][0].upper() if user and user[1] else 'U' }}
         </div>
-
-        <div class="col-lg-8">
-            <div class="health-card h-100 p-0 overflow-hidden d-flex flex-column">
-                <div class="p-4 border-bottom bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0"><i class="fas fa-map-marked-alt text-primary me-2"></i>Medical Map</h5>
-                    <button class="btn btn-sm btn-primary-modern" onclick="initMap()">
-                        <i class="fas fa-location-arrow me-2"></i>Find Hospitals
-                    </button>
-                </div>
-                
-                <div id="mapStatus" class="bg-light px-4 py-2 small text-muted border-bottom">
-                    {% if google_maps_key %}
-                    <i class="fas fa-info-circle me-1"></i> Press "Find Hospitals" to locate services.
-                    {% else %}
-                    <i class="fas fa-exclamation-triangle me-1 text-warning"></i> Google Maps API key not configured. Add <code>GOOGLE_MAPS_API_KEY</code> to your <code>.env</code> file.
-                    {% endif %}
-                </div>
-
-                <div id="map" style="height: 500px; width: 100%; background: #f0f4f8; display: flex; align-items: center; justify-content: center;">
-                    <div class="text-center text-muted" id="mapPlaceholder">
-                        <i class="fas fa-map-marked-alt d-block mb-2" style="font-size: 3rem; color: #cbd5e1;"></i>
-                        <p class="mb-0">Click <strong>Find Hospitals</strong> to load the map</p>
-                    </div>
-                </div>
-            </div>
+        <h3 class="fw-bold">{{ user[1] if user else 'Guest User' }}</h3>
+        <p class="text-muted">{{ user[2] if user else 'No Email' }}</p>
+        <hr class="my-4">
+        <div class="text-start px-2">
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted fw-semibold">Age</span>
+            <span class="fw-bold">{{ user[4] if user else 'N/A' }}</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted fw-semibold">Email</span>
+            <span class="fw-bold" style="font-size:13px;">{{ user[2] if user else 'N/A' }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted fw-semibold">Emergency</span>
+            <span class="fw-bold text-danger">{{ user[5] if user else 'Not Set' }}</span>
+          </div>
         </div>
+        <div class="mt-5 d-grid gap-2">
+          <a href="/assess" class="btn btn-primary rounded-pill">
+            <i class="fas fa-heartbeat me-2"></i>New Health Check
+          </a>
+          <a href="/logout" class="btn btn-outline-danger rounded-pill">
+            <i class="fas fa-sign-out-alt me-2"></i>Logout
+          </a>
+        </div>
+      </div>
     </div>
+
+    <!-- RIGHT: Map + Nearby -->
+    <div class="col-lg-8">
+      <div class="health-card h-100 p-0 overflow-hidden">
+
+        <!-- Header -->
+        <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-map-marked-alt text-primary me-2"></i>Medical Map
+          </h5>
+          <button class="btn btn-sm btn-primary rounded-pill" onclick="initProfileMap()">
+            <i class="fas fa-location-arrow me-1"></i>Find Nearby
+          </button>
+        </div>
+
+        <!-- Status -->
+        <div class="map-status-p info mx-3 mt-3" id="profileStatus">
+          <i class="fas fa-info-circle"></i>
+          <span id="profileStatusText">Press "Find Nearby" to locate hospitals and pharmacies near you.</span>
+        </div>
+
+        <!-- Map -->
+        <div class="px-3">
+          <div id="map"></div>
+        </div>
+
+        <!-- Nearby List -->
+        <div class="p-3" id="nearbySection" style="display:none;">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h6 class="fw-bold mb-0">
+              <i class="fas fa-list-ul text-primary me-2"></i>Nearby Places
+              <span id="nearbyCount" class="badge bg-light text-dark border ms-2" style="font-size:11px;"></span>
+            </h6>
+          </div>
+          <div class="nearby-results" id="nearbyList"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
 </div>
 
-{% if google_maps_key %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
 <script>
-    let map;
-    let mapLoaded = false;
+var map, userLat = 13.0827, userLng = 80.2707;
+var allMarkers = [], routingControl;
+var allPlaces = [];
 
-    function loadGoogleMapsScript() {
-        return new Promise((resolve, reject) => {
-            if (window.google && window.google.maps) {
-                resolve();
-                return;
-            }
-            const script = document.createElement('script');
-            script.src = "https://maps.googleapis.com/maps/api/js?key={{ google_maps_key }}&libraries=places";
-            script.async = true;
-            script.defer = true;
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Failed to load Google Maps'));
-            document.head.appendChild(script);
-        });
+// Init map
+map = L.map('map').setView([userLat, userLng], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 19
+}).addTo(map);
+
+function makeIcon(color, sym) {
+    return L.divIcon({
+        className: '',
+        html: '<div style="background:' + color + ';width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.3);">' + sym + '</div>',
+        iconSize: [30, 30], iconAnchor: [15, 15], popupAnchor: [0, -17]
+    });
+}
+
+function setProfileStatus(type, msg) {
+    var el = document.getElementById('profileStatus');
+    el.className = 'map-status-p mx-3 ' + type;
+    document.getElementById('profileStatusText').innerHTML = msg;
+}
+
+function initProfileMap() {
+    setProfileStatus('info', '<i class="fas fa-spinner fa-spin me-1"></i> Getting your location...');
+    if (!navigator.geolocation) {
+        setProfileStatus('error', 'Geolocation not supported. Showing default location (Chennai).');
+        loadNearby();
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            userLat = pos.coords.latitude;
+            userLng = pos.coords.longitude;
+            map.setView([userLat, userLng], 14);
+            loadNearby();
+        },
+        function() {
+            setProfileStatus('error', 'Location denied. Using default location.');
+            loadNearby();
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+    );
+}
+
+function loadNearby() {
+    setProfileStatus('info', '<i class="fas fa-spinner fa-spin me-1"></i> Searching hospitals and pharmacies...');
+
+    // Clear old markers
+    allMarkers.forEach(function(m) { map.removeLayer(m); });
+    allMarkers = [];
+    allPlaces = [];
+
+    // User marker
+    var userM = L.marker([userLat, userLng], {
+        icon: makeIcon('#2563eb', '📍'), zIndexOffset: 1000
+    }).addTo(map).bindPopup('<strong>📍 Your Location</strong>');
+    allMarkers.push(userM);
+
+    var done = 0;
+    ['hospital', 'pharmacy'].forEach(function(type) {
+        var query = '[out:json][timeout:25];node["amenity"="' + type + '"](around:5000,' + userLat + ',' + userLng + ');out body;';
+        fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query))
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var items = (data.elements || []).slice(0, 10);
+                items.forEach(function(el, i) {
+                    var name = (el.tags && el.tags.name) ? el.tags.name : (type === 'hospital' ? 'Hospital' : 'Pharmacy');
+                    var dist = calcDist(userLat, userLng, el.lat, el.lon);
+                    var place = { name: name, lat: el.lat, lng: el.lon, type: type, dist: dist, phone: (el.tags && el.tags.phone) || '' };
+                    allPlaces.push(place);
+
+                    var icon = type === 'hospital' ? makeIcon('#ef4444', '🏥') : makeIcon('#10b981', '💊');
+                    var m = L.marker([el.lat, el.lon], { icon: icon }).addTo(map);
+                    m.bindPopup('<strong>' + name + '</strong><br><small>📏 ' + dist.toFixed(1) + ' km</small><br>' +
+                        '<button onclick="showProfileRoute(' + allPlaces.length - 1 + ')" style="background:#2563eb;color:white;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;margin-top:5px;">🗺️ Route</button>');
+                    allMarkers.push(m);
+                    place._marker = m;
+                });
+                done++;
+                if (done === 2) finalizeResults();
+            })
+            .catch(function() {
+                done++;
+                if (done === 2) finalizeResults();
+            });
+    });
+}
+
+function finalizeResults() {
+    allPlaces.sort(function(a, b) { return a.dist - b.dist; });
+
+    if (allPlaces.length === 0) {
+        setProfileStatus('error', 'No nearby places found. Try the full Nearby page for a larger search.');
+        return;
     }
 
-    async function initMap() {
-        const statusEl = document.getElementById('mapStatus');
-        const placeholder = document.getElementById('mapPlaceholder');
+    setProfileStatus('success', '✅ Found ' + allPlaces.length + ' nearby places. Click any card to show route.');
 
-        if (!navigator.geolocation) {
-            statusEl.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Geolocation not supported by your browser.</span>';
-            return;
-        }
+    // Fit bounds
+    var group = L.featureGroup(allMarkers);
+    map.fitBounds(group.getBounds().pad(0.15));
 
-        statusEl.innerHTML = '<span class="text-primary fw-bold"><i class="fas fa-spinner fa-spin me-1"></i>Loading map & locating you...</span>';
+    // Render list
+    document.getElementById('nearbySection').style.display = 'block';
+    document.getElementById('nearbyCount').textContent = allPlaces.length + ' found';
 
-        try {
-            await loadGoogleMapsScript();
+    var html = '';
+    allPlaces.forEach(function(p, i) {
+        html += '<div class="nr-item" id="nr-' + i + '" onclick="cardClickProfile(' + i + ')">' +
+            '<div class="nr-icon ' + (p.type === 'hospital' ? 'h' : 'p') + '">' +
+            '<i class="fas fa-' + (p.type === 'hospital' ? 'hospital' : 'pills') + '"></i></div>' +
+            '<div style="flex:1;min-width:0;">' +
+            '<div class="nr-name">' + p.name + '</div>' +
+            '<div class="nr-sub">' + (p.phone ? p.phone : p.type.charAt(0).toUpperCase() + p.type.slice(1)) + '</div>' +
+            '</div>' +
+            '<span class="nr-dist">' + p.dist.toFixed(1) + ' km</span>' +
+            '<button class="btn-route-sm ' + (p.type === 'pharmacy' ? 'p' : '') + '" onclick="event.stopPropagation();showProfileRoute(' + i + ')">Route</button>' +
+            '</div>';
+    });
+    document.getElementById('nearbyList').innerHTML = html;
+}
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const userPos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    };
+function cardClickProfile(idx) {
+    var p = allPlaces[idx];
+    if (!p) return;
+    map.setView([p.lat, p.lng], 16);
+    if (p._marker) p._marker.openPopup();
+    document.querySelectorAll('.nr-item').forEach(function(el) { el.classList.remove('active'); });
+    var el = document.getElementById('nr-' + idx);
+    if (el) el.classList.add('active');
+}
 
-                    if (placeholder) placeholder.style.display = 'none';
+function showProfileRoute(idx) {
+    var p = allPlaces[idx];
+    if (!p) return;
+    if (routingControl) { map.removeControl(routingControl); routingControl = null; }
 
-                    map = new google.maps.Map(document.getElementById("map"), {
-                        center: userPos,
-                        zoom: 14,
-                    });
+    setProfileStatus('info', '<i class="fas fa-spinner fa-spin me-1"></i> Calculating route to ' + p.name + '...');
 
-                    new google.maps.Marker({
-                        position: userPos,
-                        map: map,
-                        title: "You are here",
-                        icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                    });
+    routingControl = L.Routing.control({
+        waypoints: [L.latLng(userLat, userLng), L.latLng(p.lat, p.lng)],
+        routeWhileDragging: false,
+        show: false,
+        addWaypoints: false,
+        lineOptions: { styles: [{ color: p.type === 'hospital' ? '#ef4444' : '#10b981', weight: 5, opacity: 0.85 }] },
+        createMarker: function() { return null; }
+    }).addTo(map);
 
-                    statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Location found. Searching for hospitals...';
-                    findHospitals(userPos);
-                },
-                (error) => {
-                    statusEl.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Location access denied. Please allow location in browser settings.</span>';
-                },
-                { timeout: 10000, enableHighAccuracy: true }
-            );
-        } catch (err) {
-            statusEl.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Failed to load Google Maps. Check your API key.</span>';
-        }
-    }
+    routingControl.on('routesfound', function(e) {
+        var r = e.routes[0];
+        var dist = (r.summary.totalDistance / 1000).toFixed(1);
+        var time = Math.round(r.summary.totalTime / 60);
+        setProfileStatus('success', '✅ Route to ' + p.name + ' — ' + dist + ' km | ~' + time + ' min');
+    });
 
-    function findHospitals(location) {
-        const request = {
-            location: location,
-            radius: '5000',
-            type: ['hospital']
-        };
+    map.setView([(userLat + p.lat)/2, (userLng + p.lng)/2], 14);
+    document.querySelectorAll('.nr-item').forEach(function(el) { el.classList.remove('active'); });
+    var el = document.getElementById('nr-' + idx);
+    if (el) { el.classList.add('active'); el.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+}
 
-        const service = new google.maps.places.PlacesService(map);
-        service.nearbySearch(request, (results, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                document.getElementById('mapStatus').innerHTML = 
-                    '<i class="fas fa-check-circle text-success me-1"></i> Found ' + results.length + ' hospitals nearby.';
-                for (let i = 0; i < results.length; i++) {
-                    createMarker(results[i]);
-                }
-            } else {
-                document.getElementById('mapStatus').innerHTML = 
-                    '<i class="fas fa-exclamation-triangle text-warning me-1"></i> No hospitals found nearby. Try a different area.';
-            }
-        });
-    }
-
-    function createMarker(place) {
-        if (!place.geometry || !place.geometry.location) return;
-
-        const marker = new google.maps.Marker({
-            map,
-            position: place.geometry.location,
-            title: place.name
-        });
-
-        const infowindow = new google.maps.InfoWindow();
-
-        marker.addListener("click", () => {
-            infowindow.setContent(`
-                <div style="padding:5px;">
-                    <strong>${place.name}</strong><br>
-                    <small>${place.vicinity}</small><br>
-                    <small>Rating: ${place.rating || 'N/A'} ⭐</small>
-                </div>
-            `);
-            infowindow.open(map, marker);
-        });
-    }
+function calcDist(lat1, lng1, lat2, lng2) {
+    var R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+    var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
 </script>
-{% else %}
-<script>
-    function initMap() {
-        document.getElementById('mapStatus').innerHTML = 
-            '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Google Maps API key not configured. Contact the administrator.</span>';
-    }
-</script>
-{% endif %}
 {% endblock %}

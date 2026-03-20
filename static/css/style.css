@@ -139,3 +139,126 @@ body {
 .delay-1 { animation-delay: 0.1s; }
 .delay-2 { animation-delay: 0.2s; }
 .delay-3 { animation-delay: 0.3s; }
+
+/* 7. GLASS CARD — Navbar, Auth Forms */
+.glass-nav {
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 36px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255,255,255,0.7);
+}
+.form-glass {
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 10px 14px;
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-glass:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+.glass-input {
+    background: rgba(248, 250, 252, 0.8);
+}
+.btn-primary-glass {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    color: white;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+.btn-primary-glass:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+    color: white;
+}
+.btn-pill { border-radius: 50px !important; }
+.btn-primary-soft {
+    background: rgba(79, 70, 229, 0.12);
+    color: var(--primary);
+    border: none;
+    font-weight: 600;
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+.btn-primary-soft:hover {
+    background: rgba(79, 70, 229, 0.2);
+    color: var(--primary-dark);
+}
+.avatar-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), #7c3aed);
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.animate-in {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 8. MOBILE RESPONSIVE — Auth forms, general */
+@media (max-width: 576px) {
+    .glass-card {
+        padding: 24px 18px;
+        margin: 0 8px;
+        border-radius: 16px;
+    }
+    .glass-card h2 {
+        font-size: 1.3rem;
+    }
+    .form-glass,
+    .glass-input,
+    .form-control,
+    .form-select {
+        font-size: 14px;
+        padding: 10px 12px;
+        max-width: 100%;
+    }
+    .input-group .form-control,
+    .input-group .form-select {
+        font-size: 14px;
+    }
+    .input-group-text {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    .btn-primary-glass,
+    .btn-lg {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+    .form-label {
+        font-size: 13px;
+    }
+    .container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .navbar-brand span {
+        font-size: 1rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .glass-card {
+        padding: 28px 22px;
+    }
+    .row.justify-content-center {
+        padding: 0 8px;
+    }
+}

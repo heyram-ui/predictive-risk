@@ -1,64 +1,88 @@
 {% extends "base.html" %}
 {% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-body { font-family:'Inter',sans-serif !important; background:#f0f4f8; }
-.nearby-wrap { padding: 36px 0 70px; }
+body { font-family:'Inter',sans-serif!important; background:#f0f4f8; }
+.nearby-wrap { padding:30px 0 70px; }
 
 /* Header */
-.nb-header { display:flex; align-items:center; gap:16px; margin-bottom:28px; }
+.nb-header { display:flex;align-items:center;gap:16px;margin-bottom:24px; }
 .nb-icon { width:52px;height:52px;background:linear-gradient(135deg,#2563eb,#3b82f6);border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;box-shadow:0 4px 16px rgba(37,99,235,.35); }
 .nb-header h2 { font-size:1.7rem;font-weight:900;color:#0d1b2a;margin:0; }
 .nb-header p  { color:#64748b;margin:0;font-size:14px; }
 
 /* Search card */
-.search-card { background:white;border-radius:20px;padding:22px 26px;box-shadow:0 2px 14px rgba(0,0,0,.07);border:1px solid #e2e8f0;margin-bottom:22px; }
+.search-card { background:white;border-radius:20px;padding:20px 24px;box-shadow:0 2px 14px rgba(0,0,0,.07);border:1px solid #e2e8f0;margin-bottom:20px; }
 .sf-row { display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end; }
 .sf-group { flex:1;min-width:130px; }
 .sf-label { font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px; }
-.sf-select { border:2px solid #e8ecf0;border-radius:12px;padding:9px 13px;width:100%;font-family:'Inter',sans-serif;font-size:14px;background:#f8fafc; }
-.btn-loc { padding:10px 18px;border:2px solid #e8ecf0;border-radius:50px;background:white;font-weight:600;font-size:13px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s; }
+.sf-select { border:2px solid #e8ecf0;border-radius:12px;padding:9px 13px;width:100%;font-family:'Inter',sans-serif;font-size:14px;background:#f8fafc;outline:none; }
+.btn-loc { padding:10px 18px;border:2px solid #e8ecf0;border-radius:50px;background:white;font-weight:600;font-size:13px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;white-space:nowrap; }
 .btn-loc:hover { border-color:#2563eb;color:#2563eb; }
 .btn-loc.located { border-color:#10b981;color:#10b981;background:#f0fdf4; }
 .btn-search { padding:10px 26px;border:none;border-radius:50px;background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;font-weight:700;font-size:14px;box-shadow:0 4px 16px rgba(37,99,235,.35);cursor:pointer;display:flex;align-items:center;gap:7px;transition:transform .2s; }
 .btn-search:hover { transform:translateY(-2px); }
 
 /* Layout */
-.map-layout { display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start; }
+.map-layout { display:grid;grid-template-columns:1fr 390px;gap:20px;align-items:start; }
 @media(max-width:900px){.map-layout{grid-template-columns:1fr;}}
 
 /* Map */
-#mapFrame { width:100%;height:540px;border-radius:20px;border:1px solid #e2e8f0;box-shadow:0 4px 20px rgba(0,0,0,.1); }
-.map-placeholder { width:100%;height:540px;border-radius:20px;border:2px dashed #bfdbfe;background:linear-gradient(135deg,#eff6ff,#f0f4f8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#94a3b8; }
-.map-placeholder i { font-size:2.8rem;color:#bfdbfe; }
-.map-placeholder p { text-align:center;max-width:240px;font-size:14px; }
+#map { width:100%;height:560px;border-radius:20px;border:1px solid #e2e8f0;box-shadow:0 4px 20px rgba(0,0,0,.1);z-index:1; }
 
-/* Results */
-.results-scroll { max-height:540px;overflow-y:auto;padding-right:4px; }
-.results-scroll::-webkit-scrollbar { width:5px; }
+/* Results panel */
+.results-panel { background:white;border-radius:20px;border:1px solid #e2e8f0;box-shadow:0 2px 14px rgba(0,0,0,.07);overflow:hidden; }
+.results-header { padding:14px 18px;border-bottom:1px solid #f1f5f9;font-weight:800;font-size:14px;color:#0d1b2a;display:flex;align-items:center;gap:8px;background:#fafbfc; }
+.results-scroll { max-height:508px;overflow-y:auto;padding:10px; }
+.results-scroll::-webkit-scrollbar { width:4px; }
 .results-scroll::-webkit-scrollbar-thumb { background:#e2e8f0;border-radius:3px; }
-.sec-head { font-weight:800;font-size:14px;color:#0d1b2a;margin-bottom:10px;display:flex;align-items:center;gap:8px; }
-.res-count { background:#f1f5f9;color:#64748b;border-radius:50px;padding:2px 10px;font-size:12px;font-weight:600; }
+.sec-head { font-weight:800;font-size:13px;color:#0d1b2a;margin:10px 4px 8px;display:flex;align-items:center;gap:8px; }
+.res-count { background:#f1f5f9;color:#64748b;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:600; }
 
 /* Place card */
-.place-card { background:white;border-radius:16px;padding:15px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,.04);margin-bottom:10px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:12px; }
-.place-card:hover { border-color:#2563eb;box-shadow:0 4px 16px rgba(37,99,235,.15); }
-.pl-icon { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0; }
-.pi-h { background:rgba(239,68,68,.1);color:#ef4444; }
-.pi-p { background:rgba(16,185,129,.1);color:#10b981; }
-.pl-name { font-weight:700;font-size:13px;color:#0d1b2a;margin-bottom:2px; }
-.pl-addr { font-size:11px;color:#94a3b8;margin-bottom:5px; }
-.pl-meta { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
-.open-t   { background:#f0fdf4;color:#15803d;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:600; }
-.closed-t { background:#fef2f2;color:#dc2626;border-radius:50px;padding:2px 9px;font-size:11px;font-weight:600; }
-.dir-a { font-size:12px;color:#2563eb;font-weight:600;text-decoration:none; }
-.dir-a:hover { text-decoration:underline; }
-.star { color:#f59e0b;font-size:12px; }
+.place-card { background:#fafbfc;border-radius:14px;padding:12px;border:1px solid #e8ecf0;margin-bottom:8px;cursor:pointer;transition:all .2s; }
+.place-card:hover,.place-card.active { border-color:#2563eb;background:#eff6ff;box-shadow:0 2px 12px rgba(37,99,235,.15); }
+.place-card.active-pharmacy { border-color:#10b981;background:#f0fdf4; }
+.pl-top { display:flex;align-items:flex-start;gap:10px; }
+.pl-icon { width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0; }
+.pi-h { background:rgba(239,68,68,.12);color:#ef4444; }
+.pi-p { background:rgba(16,185,129,.12);color:#10b981; }
+.pl-name { font-weight:700;font-size:12px;color:#0d1b2a;margin-bottom:2px; }
+.pl-addr { font-size:11px;color:#94a3b8;line-height:1.4; }
+.pl-meta { display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px; }
+.badge-open   { background:#f0fdf4;color:#15803d;border-radius:50px;padding:2px 8px;font-size:10px;font-weight:700; }
+.badge-closed { background:#fef2f2;color:#dc2626;border-radius:50px;padding:2px 8px;font-size:10px;font-weight:700; }
+.badge-blue   { background:#eff6ff;color:#1e40af;border-radius:50px;padding:2px 8px;font-size:10px;font-weight:600; }
+.badge-green  { background:#f0fdf4;color:#15803d;border-radius:50px;padding:2px 8px;font-size:10px;font-weight:600; }
+.star-r { color:#f59e0b;font-size:11px;font-weight:700; }
+.pl-actions { display:flex;gap:6px;margin-top:8px; }
+.btn-route { flex:1;padding:6px 10px;border:none;border-radius:8px;background:linear-gradient(135deg,#2563eb,#3b82f6);color:white;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s; }
+.btn-route:hover { transform:translateY(-1px); }
+.btn-route.pharmacy { background:linear-gradient(135deg,#10b981,#059669); }
+.btn-dir { flex:1;padding:6px 10px;border:2px solid #e2e8f0;border-radius:8px;background:white;color:#374151;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;transition:all .2s; }
+.btn-dir:hover { border-color:#2563eb;color:#2563eb; }
 
-.info-bar { background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px 16px;font-size:13px;color:#1e40af;margin-bottom:18px;display:flex;align-items:center;gap:10px; }
-.err-bar  { background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px 16px;font-size:13px;color:#dc2626;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-weight:600; }
-.nores-box { background:white;border-radius:18px;border:2px dashed #e2e8f0;padding:40px 20px;text-align:center;color:#94a3b8; }
-.nores-box i { font-size:2rem;color:#cbd5e1;margin-bottom:10px; }
+/* Legend */
+.legend { background:white;border-radius:14px;padding:12px 16px;border:1px solid #e2e8f0;margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap; }
+.leg-item { display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#374151; }
+.leg-dot { width:14px;height:14px;border-radius:50%;flex-shrink:0; }
+
+/* Status bar */
+.status-bar { background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 16px;font-size:13px;color:#1e40af;margin-bottom:16px;display:flex;align-items:center;gap:10px; }
+.status-bar.success { background:#f0fdf4;border-color:#86efac;color:#15803d; }
+.status-bar.error   { background:#fef2f2;border-color:#fecaca;color:#dc2626; }
+
+.nores-box { padding:40px 20px;text-align:center;color:#94a3b8; }
+.nores-box i { font-size:2rem;color:#cbd5e1;display:block;margin-bottom:10px; }
+
+/* Route info panel */
+#routeInfo { display:none;background:white;border-radius:14px;border:1px solid #e2e8f0;padding:14px 16px;margin-top:12px;font-size:13px; }
+#routeInfo h6 { font-weight:800;color:#0d1b2a;margin-bottom:10px;font-size:13px; }
+.route-step { padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px;color:#374151;display:flex;gap:8px;align-items:flex-start; }
+.route-step:last-child { border-bottom:none; }
+.step-icon { width:20px;height:20px;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#2563eb;flex-shrink:0;margin-top:1px; }
 </style>
 
 <div class="nearby-wrap">
@@ -68,170 +92,423 @@ body { font-family:'Inter',sans-serif !important; background:#f0f4f8; }
     <div class="nb-icon"><i class="fas fa-map-marker-alt"></i></div>
     <div>
       <h2>Nearby Hospitals & Pharmacies</h2>
-      <p>Live Google Maps — find medical facilities near you</p>
+      <p>Free interactive map — routes, directions & real-time distance</p>
     </div>
   </div>
 
-  {% if not api_key %}
-  <div class="info-bar">
-    <i class="fas fa-info-circle"></i>
-    Google Maps API key not found. Add <code>GOOGLE_MAPS_API_KEY=your_key</code> to <code>.env</code>
-  </div>
-  {% endif %}
-
-  {% if error %}
-  <div class="err-bar"><i class="fas fa-exclamation-triangle"></i>{{ error }}</div>
-  {% endif %}
-
   <!-- Search -->
   <div class="search-card">
-    <form method="POST" id="sf">
-      <input type="hidden" id="latInput" name="latitude"  value="{{ lat or '13.0827' }}">
-      <input type="hidden" id="lngInput" name="longitude" value="{{ lng or '80.2707' }}">
-      <div class="sf-row">
-        <div class="sf-group">
-          <div class="sf-label">Radius</div>
-          <select name="radius" class="sf-select">
-            <option value="2000">2 km</option>
-            <option value="5000" {% if radius=='5000' or not radius %}selected{% endif %}>5 km</option>
-            <option value="10000" {% if radius=='10000' %}selected{% endif %}>10 km</option>
-            <option value="20000" {% if radius=='20000' %}selected{% endif %}>20 km</option>
-          </select>
-        </div>
-        <div class="sf-group">
-          <div class="sf-label">Find</div>
-          <select name="search_type" class="sf-select">
-            <option value="both">Hospitals & Pharmacies</option>
-            <option value="hospital">Hospitals Only</option>
-            <option value="pharmacy">Pharmacies Only</option>
-          </select>
-        </div>
-        <button type="button" class="btn-loc" id="locBtn" onclick="locateMe()">
-          <i class="fas fa-crosshairs"></i> Use My Location
-        </button>
-        <button type="submit" class="btn-search">
-          <i class="fas fa-search"></i> Search
-        </button>
+    <div class="sf-row">
+      <div class="sf-group">
+        <div class="sf-label">Search Radius</div>
+        <select id="radiusSel" class="sf-select">
+          <option value="2000">2 km</option>
+          <option value="5000" selected>5 km</option>
+          <option value="10000">10 km</option>
+          <option value="20000">20 km</option>
+        </select>
       </div>
-    </form>
+      <div class="sf-group">
+        <div class="sf-label">Find</div>
+        <select id="typeSel" class="sf-select">
+          <option value="both">Hospitals & Pharmacies</option>
+          <option value="hospital">Hospitals Only</option>
+          <option value="pharmacy">Pharmacies Only</option>
+        </select>
+      </div>
+      <button class="btn-loc" id="locBtn" onclick="locateMe()">
+        <i class="fas fa-crosshairs"></i> Use My Location
+      </button>
+      <button class="btn-search" onclick="searchNearby()">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">
+    <i class="fas fa-info-circle"></i>
+    <span id="statusText">Click "Use My Location" then press Search to find nearby hospitals and pharmacies.</span>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#2563eb"></div> Your Location</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ef4444"></div> Hospital</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#10b981"></div> Pharmacy</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div> Selected Route</div>
   </div>
 
   <!-- Map + Results -->
   <div class="map-layout">
 
-    <!-- MAP -->
     <div>
-      {% if hospitals or pharmacies %}
-        {# Build the query string for the embedded map showing all results #}
-        {% set first = (hospitals + pharmacies)[0] %}
-        <iframe id="mapFrame"
-          src="https://maps.google.com/maps?q={{ first.lat }},{{ first.lng }}&z=13&output=embed"
-          allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-      {% elif lat and api_key %}
-        <iframe id="mapFrame"
-          src="https://maps.google.com/maps?q=hospitals+near+{{ lat }},{{ lng }}&z=13&output=embed"
-          allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-      {% else %}
-        <div class="map-placeholder">
-          <i class="fas fa-map-marked-alt d-block"></i>
-          <p>Click <strong>"Use My Location"</strong> then <strong>Search</strong> to see the map and nearby facilities here.</p>
-          <p style="font-size:12px;">Or: <a href="https://www.google.com/maps/search/hospitals+near+me" target="_blank" style="color:#2563eb;font-weight:600;">Open Google Maps →</a></p>
-        </div>
-      {% endif %}
+      <div id="map"></div>
+      <!-- Route info -->
+      <div id="routeInfo">
+        <h6><i class="fas fa-route me-2 text-primary"></i>Route Details</h6>
+        <div id="routeSteps"></div>
+      </div>
     </div>
 
-    <!-- RESULTS -->
-    <div class="results-scroll">
-      {% if hospitals %}
-      <div class="sec-head">
-        <i class="fas fa-hospital text-danger"></i>
-        Hospitals <span class="res-count">{{ hospitals|length }}</span>
+    <!-- Results Panel -->
+    <div class="results-panel">
+      <div class="results-header">
+        <i class="fas fa-list-ul text-primary"></i>
+        Search Results
+        <span class="res-count ms-auto" id="totalCount">0 found</span>
       </div>
-      {% for h in hospitals %}
-      <div class="place-card" onclick="openMap({{ h.lat }}, {{ h.lng }})">
-        <div class="pl-icon pi-h"><i class="fas fa-hospital"></i></div>
-        <div>
-          <div class="pl-name">{{ h.name }}</div>
-          <div class="pl-addr">{{ h.address }}</div>
-          <div class="pl-meta">
-            {% if h.rating and h.rating != 'N/A' %}<span class="star">★ {{ h.rating }}</span>{% endif %}
-            {% if h.open_now == True %}<span class="open-t">Open</span>
-            {% elif h.open_now == False %}<span class="closed-t">Closed</span>{% endif %}
-            <a class="dir-a" href="https://maps.google.com/?q={{ h.lat }},{{ h.lng }}" target="_blank">
-              <i class="fas fa-directions me-1"></i>Directions
-            </a>
-          </div>
+      <div class="results-scroll" id="resultsPanel">
+        <div class="nores-box">
+          <i class="fas fa-map-marker-alt"></i>
+          <p>Use your location and press Search to see nearby hospitals and pharmacies here.</p>
         </div>
       </div>
-      {% endfor %}
-      {% endif %}
-
-      {% if pharmacies %}
-      <div class="sec-head mt-3">
-        <i class="fas fa-pills text-success"></i>
-        Pharmacies <span class="res-count">{{ pharmacies|length }}</span>
-      </div>
-      {% for p in pharmacies %}
-      <div class="place-card" onclick="openMap({{ p.lat }}, {{ p.lng }})">
-        <div class="pl-icon pi-p"><i class="fas fa-pills"></i></div>
-        <div>
-          <div class="pl-name">{{ p.name }}</div>
-          <div class="pl-addr">{{ p.address }}</div>
-          <div class="pl-meta">
-            {% if p.rating and p.rating != 'N/A' %}<span class="star">★ {{ p.rating }}</span>{% endif %}
-            {% if p.open_now == True %}<span class="open-t">Open</span>
-            {% elif p.open_now == False %}<span class="closed-t">Closed</span>{% endif %}
-            <a class="dir-a" href="https://maps.google.com/?q={{ p.lat }},{{ p.lng }}" target="_blank">
-              <i class="fas fa-directions me-1"></i>Directions
-            </a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-      {% endif %}
-
-      {% if not hospitals and not pharmacies %}
-      <div class="nores-box">
-        <i class="fas fa-map-marker-alt d-block"></i>
-        <p>Click <strong>Use My Location</strong> then press <strong>Search</strong> to find nearby places.</p>
-      </div>
-      {% endif %}
     </div>
 
   </div>
+
 </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
 <script>
-function locateMe() {
-  var btn = document.getElementById('locBtn');
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding...';
-  if (!navigator.geolocation) {
-    alert('Geolocation is not supported by your browser.');
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(
-    function(pos) {
-      document.getElementById('latInput').value = pos.coords.latitude.toFixed(6);
-      document.getElementById('lngInput').value = pos.coords.longitude.toFixed(6);
-      btn.innerHTML = '<i class="fas fa-check"></i> Location Set!';
-      btn.classList.add('located');
-    },
-    function(err) {
-      btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Location';
-      alert('Location error: ' + err.message + '\nPlease allow location access in your browser settings.');
-    },
-    { timeout: 10000, enableHighAccuracy: true }
-  );
+// ── State ─────────────────────────────────────────────────────────────────────
+var map, userMarker, routingControl;
+var userLat = 13.0827, userLng = 80.2707;
+var allMarkers = [];
+var hospitals = [], pharmacies = [];
+var locationSet = false;
+
+// ── Init Map ──────────────────────────────────────────────────────────────────
+map = L.map('map', { zoomControl: true }).setView([userLat, userLng], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+}).addTo(map);
+
+// ── Custom Icons ──────────────────────────────────────────────────────────────
+function makeIcon(color, symbol) {
+    return L.divIcon({
+        className: '',
+        html: '<div style="background:' + color + ';width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:14px;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);">' + symbol + '</div>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -18]
+    });
 }
 
-function openMap(lat, lng) {
-  var frame = document.getElementById('mapFrame');
-  if (frame) {
-    frame.src = 'https://maps.google.com/maps?q=' + lat + ',' + lng + '&z=16&output=embed';
-  }
+var iconUser     = makeIcon('#2563eb', '📍');
+var iconHospital = makeIcon('#ef4444', '🏥');
+var iconPharmacy = makeIcon('#10b981', '💊');
+var iconSelected = makeIcon('#f59e0b', '⭐');
+
+// ── Locate Me ─────────────────────────────────────────────────────────────────
+function locateMe() {
+    var btn = document.getElementById('locBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Finding...';
+    setStatus('info', 'Getting your location...');
+
+    if (!navigator.geolocation) {
+        setStatus('error', 'Geolocation not supported by your browser.');
+        btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Location';
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            userLat = pos.coords.latitude;
+            userLng = pos.coords.longitude;
+            locationSet = true;
+
+            map.setView([userLat, userLng], 14);
+
+            if (userMarker) map.removeLayer(userMarker);
+            userMarker = L.marker([userLat, userLng], { icon: iconUser, zIndexOffset: 1000 })
+                .addTo(map)
+                .bindPopup('<strong>📍 You are here</strong>')
+                .openPopup();
+
+            btn.innerHTML = '<i class="fas fa-check"></i> Location Set!';
+            btn.classList.add('located');
+            setStatus('success', 'Location found! Now press Search to find nearby places.');
+        },
+        function(err) {
+            btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Location';
+            setStatus('error', 'Location denied. Please allow location in browser settings. Using default: Chennai.');
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+    );
+}
+
+// ── Search Nearby ─────────────────────────────────────────────────────────────
+function searchNearby() {
+    var radius = document.getElementById('radiusSel').value;
+    var type   = document.getElementById('typeSel').value;
+
+    setStatus('info', '<i class="fas fa-spinner fa-spin me-1"></i> Searching for nearby places...');
+    clearMarkers();
+    hospitals = [];
+    pharmacies = [];
+    document.getElementById('resultsPanel').innerHTML = '<div class="nores-box"><i class="fas fa-spinner fa-spin" style="color:#2563eb"></i><p>Searching...</p></div>';
+    document.getElementById('routeInfo').style.display = 'none';
+
+    var fetchList = [];
+    if (type === 'both' || type === 'hospital') fetchList.push('hospital');
+    if (type === 'both' || type === 'pharmacy') fetchList.push('pharmacy');
+
+    var done = 0;
+    fetchList.forEach(function(t) {
+        fetchOverpass(t, radius, function(results) {
+            if (t === 'hospital') hospitals = results;
+            else pharmacies = results;
+            done++;
+            if (done === fetchList.length) renderResults();
+        });
+    });
+
+    if (fetchList.length === 0) renderResults();
+}
+
+// ── Overpass API (Free OpenStreetMap data) ────────────────────────────────────
+function fetchOverpass(type, radius, callback) {
+    var tag = type === 'hospital' ? '"amenity"="hospital"' : '"amenity"="pharmacy"';
+    var query = '[out:json][timeout:25];node[' + tag + '](around:' + radius + ',' + userLat + ',' + userLng + ');out body;';
+    var url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query);
+
+    fetch(url)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var results = (data.elements || []).slice(0, 15).map(function(el) {
+                var name = (el.tags && el.tags.name) ? el.tags.name : (type === 'hospital' ? 'Hospital' : 'Pharmacy');
+                var phone = el.tags && el.tags['contact:phone'] || el.tags && el.tags.phone || '';
+                var dist = calcDist(userLat, userLng, el.lat, el.lon);
+                return {
+                    name: name,
+                    lat: el.lat,
+                    lng: el.lon,
+                    phone: phone,
+                    dist: dist,
+                    type: type,
+                    address: el.tags && el.tags['addr:street'] ? el.tags['addr:street'] + (el.tags['addr:city'] ? ', ' + el.tags['addr:city'] : '') : 'Tap map for details'
+                };
+            });
+            // Sort by distance
+            results.sort(function(a, b) { return a.dist - b.dist; });
+            callback(results);
+        })
+        .catch(function(err) {
+            console.error('Overpass error:', err);
+            callback([]);
+        });
+}
+
+// ── Haversine Distance ────────────────────────────────────────────────────────
+function calcDist(lat1, lng1, lat2, lng2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLng = (lng2 - lng1) * Math.PI / 180;
+    var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+            Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+            Math.sin(dLng/2)*Math.sin(dLng/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// ── Clear old markers ─────────────────────────────────────────────────────────
+function clearMarkers() {
+    allMarkers.forEach(function(m) { map.removeLayer(m); });
+    allMarkers = [];
+    if (routingControl) { map.removeControl(routingControl); routingControl = null; }
+}
+
+// ── Render Results ────────────────────────────────────────────────────────────
+function renderResults() {
+    var total = hospitals.length + pharmacies.length;
+    document.getElementById('totalCount').textContent = total + ' found';
+
+    if (total === 0) {
+        setStatus('error', 'No results found. Try increasing the radius.');
+        document.getElementById('resultsPanel').innerHTML = '<div class="nores-box"><i class="fas fa-search-minus"></i><p>No hospitals or pharmacies found nearby. Try a larger radius.</p></div>';
+        return;
+    }
+
+    setStatus('success', '✅ Found ' + hospitals.length + ' hospitals and ' + pharmacies.length + ' pharmacies. Click any card to show route.');
+
+    // Add markers
+    hospitals.forEach(function(h, i) {
+        var m = L.marker([h.lat, h.lng], { icon: iconHospital })
+            .addTo(map)
+            .bindPopup(buildPopup(h, i, 'hospital'));
+        allMarkers.push(m);
+        h._marker = m;
+        h._index  = i;
+    });
+    pharmacies.forEach(function(p, i) {
+        var m = L.marker([p.lat, p.lng], { icon: iconPharmacy })
+            .addTo(map)
+            .bindPopup(buildPopup(p, i, 'pharmacy'));
+        allMarkers.push(m);
+        p._marker = m;
+        p._index  = i;
+    });
+
+    // Fit map to all markers
+    if (allMarkers.length > 0) {
+        var group = L.featureGroup(allMarkers);
+        if (userMarker) group.addLayer(userMarker);
+        map.fitBounds(group.getBounds().pad(0.15));
+    }
+
+    // Build HTML
+    var html = '';
+
+    if (hospitals.length > 0) {
+        html += '<div class="sec-head"><i class="fas fa-hospital text-danger"></i> Hospitals <span class="res-count">' + hospitals.length + '</span></div>';
+        hospitals.forEach(function(h, i) {
+            html += buildCard(h, i, 'hospital');
+        });
+    }
+
+    if (pharmacies.length > 0) {
+        html += '<div class="sec-head mt-2"><i class="fas fa-pills text-success"></i> Pharmacies <span class="res-count">' + pharmacies.length + '</span></div>';
+        pharmacies.forEach(function(p, i) {
+            html += buildCard(p, i, 'pharmacy');
+        });
+    }
+
+    document.getElementById('resultsPanel').innerHTML = html;
+}
+
+// ── Build popup HTML ──────────────────────────────────────────────────────────
+function buildPopup(place, idx, type) {
+    var dirUrl = 'https://www.google.com/maps/dir/' + userLat + ',' + userLng + '/' + place.lat + ',' + place.lng;
+    return '<div style="min-width:180px;font-family:Inter,sans-serif;">' +
+        '<strong style="font-size:13px;">' + place.name + '</strong><br>' +
+        '<small style="color:#64748b;">' + place.address + '</small><br>' +
+        (place.phone ? '<small>📞 ' + place.phone + '</small><br>' : '') +
+        '<small>📏 ' + place.dist.toFixed(1) + ' km away</small><br><br>' +
+        '<button onclick="showRoute(' + idx + ',\'' + type + '\')" style="background:#2563eb;color:white;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-right:6px;">🗺️ Route</button>' +
+        '<a href="' + dirUrl + '" target="_blank" style="background:#f1f5f9;color:#374151;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;text-decoration:none;">📍 Directions</a>' +
+        '</div>';
+}
+
+// ── Build card HTML ───────────────────────────────────────────────────────────
+function buildCard(place, idx, type) {
+    var isH = type === 'hospital';
+    var dirUrl = 'https://www.google.com/maps/dir/' + userLat + ',' + userLng + '/' + place.lat + ',' + place.lng;
+    return '<div class="place-card" id="card-' + type + '-' + idx + '" onclick="cardClick(' + idx + ',\'' + type + '\')">' +
+        '<div class="pl-top">' +
+        '<div class="pl-icon ' + (isH ? 'pi-h' : 'pi-p') + '"><i class="fas fa-' + (isH ? 'hospital' : 'pills') + '"></i></div>' +
+        '<div style="flex:1;min-width:0;">' +
+        '<div class="pl-name">' + place.name + '</div>' +
+        '<div class="pl-addr">' + place.address + '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="pl-meta">' +
+        '<span class="badge-blue"><i class="fas fa-route me-1"></i>' + place.dist.toFixed(1) + ' km</span>' +
+        (place.phone ? '<span class="badge-green"><i class="fas fa-phone me-1"></i>' + place.phone + '</span>' : '') +
+        '</div>' +
+        '<div class="pl-actions">' +
+        '<button class="btn-route ' + (isH ? '' : 'pharmacy') + '" onclick="event.stopPropagation();showRoute(' + idx + ',\'' + type + '\')"><i class="fas fa-route"></i> Show Route</button>' +
+        '<a class="btn-dir" href="' + dirUrl + '" target="_blank" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> Google Maps</a>' +
+        '</div>' +
+        '</div>';
+}
+
+// ── Card click ────────────────────────────────────────────────────────────────
+function cardClick(idx, type) {
+    var place = type === 'hospital' ? hospitals[idx] : pharmacies[idx];
+    if (!place) return;
+    map.setView([place.lat, place.lng], 16);
+    if (place._marker) place._marker.openPopup();
+
+    // Highlight card
+    document.querySelectorAll('.place-card').forEach(function(c) {
+        c.classList.remove('active', 'active-pharmacy');
+    });
+    var card = document.getElementById('card-' + type + '-' + idx);
+    if (card) card.classList.add(type === 'hospital' ? 'active' : 'active-pharmacy');
+}
+
+// ── Show Route ────────────────────────────────────────────────────────────────
+function showRoute(idx, type) {
+    var place = type === 'hospital' ? hospitals[idx] : pharmacies[idx];
+    if (!place) return;
+
+    setStatus('info', '<i class="fas fa-spinner fa-spin me-1"></i> Calculating route to ' + place.name + '...');
+
+    if (routingControl) { map.removeControl(routingControl); routingControl = null; }
+
+    var color = type === 'hospital' ? '#ef4444' : '#10b981';
+
+    routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng(userLat, userLng),
+            L.latLng(place.lat, place.lng)
+        ],
+        routeWhileDragging: false,
+        show: false,
+        addWaypoints: false,
+        lineOptions: {
+            styles: [{ color: color, weight: 5, opacity: 0.85 }]
+        },
+        createMarker: function() { return null; }
+    }).addTo(map);
+
+    routingControl.on('routesfound', function(e) {
+        var route = e.routes[0];
+        var dist  = (route.summary.totalDistance / 1000).toFixed(1);
+        var time  = Math.round(route.summary.totalTime / 60);
+
+        setStatus('success', '✅ Route to ' + place.name + ' — ' + dist + ' km | ~' + time + ' min driving');
+
+        // Show steps
+        var stepsHtml = '<div style="display:flex;gap:16px;margin-bottom:10px;">' +
+            '<span style="background:#eff6ff;color:#1e40af;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;"><i class="fas fa-road me-1"></i>' + dist + ' km</span>' +
+            '<span style="background:#f0fdf4;color:#15803d;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;"><i class="fas fa-clock me-1"></i>~' + time + ' min</span>' +
+            '</div>';
+
+        var steps = route.instructions || [];
+        steps.slice(0, 8).forEach(function(step, i) {
+            var txt = step.text || step.instruction || '';
+            stepsHtml += '<div class="route-step">' +
+                '<div class="step-icon">' + (i+1) + '</div>' +
+                '<span>' + txt + '</span>' +
+                '</div>';
+        });
+        if (steps.length > 8) {
+            stepsHtml += '<div class="route-step" style="color:#94a3b8;font-size:11px;">... and ' + (steps.length - 8) + ' more steps</div>';
+        }
+
+        document.getElementById('routeSteps').innerHTML = stepsHtml;
+        document.getElementById('routeInfo').style.display = 'block';
+    });
+
+    routingControl.on('routingerror', function(e) {
+        setStatus('error', 'Could not calculate route. Check your internet connection.');
+    });
+
+    // Pan to destination
+    map.setView([(userLat + place.lat)/2, (userLng + place.lng)/2], 14);
+
+    // Highlight card
+    document.querySelectorAll('.place-card').forEach(function(c) {
+        c.classList.remove('active', 'active-pharmacy');
+    });
+    var card = document.getElementById('card-' + type + '-' + idx);
+    if (card) {
+        card.classList.add(type === 'hospital' ? 'active' : 'active-pharmacy');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+// ── Status helper ─────────────────────────────────────────────────────────────
+function setStatus(type, msg) {
+    var bar = document.getElementById('statusBar');
+    bar.className = 'status-bar' + (type === 'success' ? ' success' : type === 'error' ? ' error' : '');
+    document.getElementById('statusText').innerHTML = msg;
 }
 </script>
 {% endblock %}
