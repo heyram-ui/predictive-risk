@@ -6,7 +6,7 @@ Flask-SQLAlchemy==3.0.5
 Flask-Login==0.6.2
 python-dotenv==1.0.0
 Werkzeug==2.3.7
-psycopg2-binary==2.9.9
+psycopg[binary]
 
 # ML & Data Science — versions compatible with Python 3.14 (Render default)
 scikit-learn==1.7.2
