@@ -10,7 +10,6 @@ import hashlib
 from datetime import datetime, date
 import json
 from flask_mail import Mail, Message
-import psycopg2
 import psycopg
 from psycopg2.extras import RealDictCursor
 import pandas as pd
