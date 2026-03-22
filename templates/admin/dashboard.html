@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+body { font-family: 'Inter', sans-serif !important; }
+
+.admin-wrap { background: #f0f4f8; min-height: 100vh; padding: 36px 0 60px; }
+
+.admin-header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0d6e6e 100%);
+    border-radius: 24px;
+    padding: 32px 28px;
+    color: white;
+    margin-bottom: 28px;
+    box-shadow: 0 12px 40px rgba(13,110,110,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.admin-header h1 { font-size: 1.6rem; font-weight: 900; margin: 0; }
+.admin-header p { opacity: 0.7; font-size: 14px; margin: 4px 0 0; }
+.admin-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 6px 16px; border-radius: 50px; font-size: 12px; font-weight: 700; }
+
+/* Metric Cards */
+.admin-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
+@media(max-width:900px) { .admin-metrics { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:500px) { .admin-metrics { grid-template-columns: 1fr; } }
+
+.admin-metric {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e8ecf0;
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+.admin-metric:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+.am-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+.am-teal   { background: rgba(13,110,110,0.12);  color: #0d6e6e; }
+.am-blue   { background: rgba(37,99,235,0.12);   color: #2563eb; }
+.am-purple { background: rgba(124,58,237,0.12);  color: #7c3aed; }
+.am-orange { background: rgba(245,158,11,0.12);  color: #f59e0b; }
+.am-value  { font-size: 1.55rem; font-weight: 800; color: #0d1b2a; line-height: 1; }
+.am-label  { font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 4px; }
+
+/* Table Card */
+.table-card {
+    background: white;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e8ecf0;
+    margin-bottom: 28px;
+}
+.table-card h5 { font-weight: 800; font-size: 1rem; color: #0d1b2a; margin-bottom: 20px; }
+
+.admin-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.admin-table thead th {
+    background: #f8fafc;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    padding: 12px 14px;
+    border-bottom: 2px solid #e8ecf0;
+}
+.admin-table tbody td {
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+.admin-table tbody tr:hover { background: #f8fafc; }
+
+.risk-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.risk-low    { background: #f0fdf4; color: #15803d; }
+.risk-medium { background: #fefce8; color: #a16207; }
+.risk-high   { background: #fef2f2; color: #dc2626; }
+
+/* ML Status Card */
+.ml-status-card {
+    background: linear-gradient(135deg, #312e81, #4c1d95);
+    border-radius: 24px;
+    padding: 28px;
+    color: white;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 32px rgba(76,29,149,0.3);
+}
+.ml-status-card h5 { font-weight: 800; margin-bottom: 16px; }
+.ml-info-row { display: flex; gap: 20px; flex-wrap: wrap; }
+.ml-info-item {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 16px;
+    flex: 1;
+    min-width: 160px;
+    text-align: center;
+}
+.ml-info-label { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.08em; }
+.ml-info-value { font-size: 1.2rem; font-weight: 800; color: #a78bfa; margin-top: 4px; }
+
+/* Feedback Card */
+.feedback-card {
+    background: white;
+    border-radius: 20px;
+    padding: 16px;
+    border: 1px solid #e8ecf0;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.fb-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6e6e, #1e3a5f);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+.fb-stars { color: #f59e0b; font-size: 12px; }
+.fb-text { font-size: 12px; color: #64748b; margin-top: 2px; }
+.fb-name { font-weight: 700; font-size: 13px; color: #0d1b2a; }
+</style>
+
+<div class="admin-wrap">
+<div class="container">
+
+    <!-- Header -->
+    <div class="admin-header">
+        <div>
+            <h1><i class="fas fa-shield-alt me-2"></i>Admin Dashboard</h1>
+            <p>Health Risk — Real-time Project Monitoring</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <span class="admin-badge"><i class="fas fa-circle text-success me-1" style="font-size:8px;"></i> System Online</span>
+            <a href="/admin-logout" class="admin-badge text-decoration-none" style="color:white;">
+                <i class="fas fa-sign-out-alt me-1"></i>Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Metric Cards -->
+    <div class="admin-metrics">
+        <div class="admin-metric">
+            <div class="am-icon am-teal"><i class="fas fa-users"></i></div>
+            <div>
+                <div class="am-value">{{ total_users }}</div>
+                <div class="am-label">Registered Users</div>
+            </div>
+        </div>
+        <div class="admin-metric">
+            <div class="am-icon am-blue"><i class="fas fa-heartbeat"></i></div>
+            <div>
+                <div class="am-value">{{ total_assessments }}</div>
+                <div class="am-label">Total Health Checkups</div>
+            </div>
+        </div>
+        <div class="admin-metric">
+            <div class="am-icon am-purple"><i class="fas fa-star"></i></div>
+            <div>
+                <div class="am-value">{{ total_feedback }}</div>
+                <div class="am-label">Feedback Received</div>
+            </div>
+        </div>
+        <div class="admin-metric">
+            <div class="am-icon am-orange"><i class="fas fa-brain"></i></div>
+            <div>
+                <div class="am-value">{{ 'Active' if ml_active else 'Offline' }}</div>
+                <div class="am-label">ML Model Status</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ML Status -->
+    <div class="ml-status-card">
+        <h5><i class="fas fa-brain me-2"></i>ML Model — Project Intelligence</h5>
+        <div class="ml-info-row">
+            <div class="ml-info-item">
+                <div class="ml-info-label">Algorithm</div>
+                <div class="ml-info-value">RandomForest</div>
+            </div>
+            <div class="ml-info-item">
+                <div class="ml-info-label">Training Records</div>
+                <div class="ml-info-value">70,000+</div>
+            </div>
+            <div class="ml-info-item">
+                <div class="ml-info-label">Features Used</div>
+                <div class="ml-info-value">8 Vitals</div>
+            </div>
+            <div class="ml-info-item">
+                <div class="ml-info-label">Disease Classes</div>
+                <div class="ml-info-value">6 Classes</div>
+            </div>
+            <div class="ml-info-item">
+                <div class="ml-info-label">Status</div>
+                <div class="ml-info-value" style="color:#34d399;">{{ 'Online ✅' if ml_active else 'Offline ❌' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Assessments Table -->
+    <div class="table-card">
+        <h5><i class="fas fa-clipboard-list me-2 text-primary"></i>Recent Health Assessments</h5>
+        {% if recent_assessments %}
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>BP</th>
+                        <th>BMI</th>
+                        <th>Sleep</th>
+                        <th>Activity</th>
+                        <th>Risk Score</th>
+                        <th>Risk Level</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in recent_assessments %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="fw-bold">{{ a.user_name or 'User' }}</td>
+                        <td>{{ a.bp_sys }}/{{ a.bp_dias }}</td>
+                        <td>{{ a.bmi|round(1) if a.bmi else 'N/A' }}</td>
+                        <td>{{ a.sleep_hours or 'N/A' }} hrs</td>
+                        <td>{{ a.activity_mins or 'N/A' }} min</td>
+                        <td><strong>{{ a.overall_score or 0 }}%</strong></td>
+                        <td>
+                            {% set risk = a.overall_risk or 'Low' %}
+                            <span class="risk-badge {% if 'High' in risk %}risk-high{% elif 'Med' in risk %}risk-medium{% else %}risk-low{% endif %}">
+                                {{ risk }}
+                            </span>
+                        </td>
+                        <td>{{ a.created_at.strftime('%b %d, %Y') if a.created_at else 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:40px;color:#94a3b8;">
+            <i class="fas fa-inbox" style="font-size:2rem;display:block;margin-bottom:10px;color:#cbd5e1;"></i>
+            <p>No assessments recorded yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Feedback -->
+    <div class="table-card">
+        <h5><i class="fas fa-star me-2 text-warning"></i>Recent User Feedback</h5>
+        {% if recent_feedback %}
+            {% for fb in recent_feedback %}
+            <div class="feedback-card">
+                <div class="fb-avatar">{{ fb.name[0]|upper if fb.name else 'U' }}</div>
+                <div style="flex:1;">
+                    <div class="fb-name">{{ fb.name or 'Anonymous' }}</div>
+                    <div class="fb-stars">
+                        {% for i in range(fb.rating or 0) %}⭐{% endfor %}
+                    </div>
+                    <div class="fb-text">{{ fb.comment or 'No comment' }}</div>
+                </div>
+                <div style="font-size:11px;color:#94a3b8;white-space:nowrap;">
+                    {{ fb.created_at.strftime('%b %d') if fb.created_at else '' }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div style="text-align:center;padding:30px;color:#94a3b8;">
+            <i class="fas fa-comment-slash" style="font-size:1.5rem;display:block;margin-bottom:8px;color:#cbd5e1;"></i>
+            <p>No feedback received yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+</div>
+{% endblock %}

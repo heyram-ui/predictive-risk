@@ -712,6 +712,91 @@ def logout():
     return redirect(url_for('home'))
 
 # =============================================================================
+# ROUTES — ADMIN
+# =============================================================================
+ADMIN_EMAIL    = 'admin@healthrisk.com'
+ADMIN_PASSWORD = 'admin123'
+
+@app.route('/admin-login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        email    = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        if email == ADMIN_EMAIL and password == ADMIN_PASSWORD:
+            session['is_admin'] = True
+            flash('Welcome, Admin!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid admin credentials.', 'danger')
+    return render_template('admin/login.html')
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if not session.get('is_admin'):
+        flash('Admin access required.', 'warning')
+        return redirect(url_for('admin_login'))
+
+    total_users = 0
+    total_assessments = 0
+    total_feedback = 0
+    recent_assessments = []
+    recent_feedback = []
+
+    conn = get_db_connection()
+    if conn:
+        try:
+            c = conn.cursor(cursor_factory=RealDictCursor)
+
+            c.execute("SELECT COUNT(*) AS cnt FROM users")
+            total_users = c.fetchone()['cnt']
+
+            c.execute("SELECT COUNT(*) AS cnt FROM assessments")
+            total_assessments = c.fetchone()['cnt']
+
+            c.execute("SELECT COUNT(*) AS cnt FROM feedback")
+            total_feedback = c.fetchone()['cnt']
+
+            c.execute("""
+                SELECT a.bp_sys, a.bp_dias, a.bmi, a.sleep_hours,
+                       a.activity_mins, a.overall_score, a.overall_risk,
+                       a.created_at, u.name AS user_name
+                FROM assessments a
+                LEFT JOIN users u ON a.user_id = u.id
+                ORDER BY a.created_at DESC
+                LIMIT 15
+            """)
+            recent_assessments = c.fetchall()
+
+            c.execute("""
+                SELECT f.name, f.rating, f.comment, f.created_at
+                FROM feedback f
+                ORDER BY f.created_at DESC
+                LIMIT 10
+            """)
+            recent_feedback = c.fetchall()
+
+        except Exception as e:
+            print(f"Admin dashboard error: {e}")
+        finally:
+            conn.close()
+
+    return render_template(
+        'admin/dashboard.html',
+        total_users=total_users,
+        total_assessments=total_assessments,
+        total_feedback=total_feedback,
+        ml_active=ml_model is not None,
+        recent_assessments=recent_assessments,
+        recent_feedback=recent_feedback
+    )
+
+@app.route('/admin-logout')
+def admin_logout():
+    session.pop('is_admin', None)
+    flash('Admin logged out.', 'info')
+    return redirect(url_for('home'))
+
+# =============================================================================
 # ROUTES — DASHBOARD
 # =============================================================================
 @app.route('/dashboard')

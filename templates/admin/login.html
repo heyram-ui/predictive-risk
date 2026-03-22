@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center" style="padding-top:40px;">
+    <div class="col-md-5">
+        <div class="glass-card animate-in">
+            <div class="text-center mb-4">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,#0d6e6e,#1e3a5f);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                    <i class="fas fa-shield-alt fa-lg" style="color:white"></i>
+                </div>
+                <h2><i class="fas fa-user-shield me-2"></i>Admin Login</h2>
+                <p class="text-muted small">Access the project monitoring dashboard</p>
+            </div>
+            <form action="/admin-login" method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Admin Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text glass-input border-0"><i class="fas fa-envelope text-primary"></i></span>
+                        <input type="email" name="email" class="form-control glass-input border-0" required
+                            placeholder="admin@healthrisk.com">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Admin Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text glass-input border-0"><i class="fas fa-lock text-primary"></i></span>
+                        <input type="password" name="password" class="form-control glass-input border-0"
+                            placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary-glass btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Admin Sign In
+                    </button>
+                </div>
+            </form>
+            <div class="text-center mt-3">
+                <a href="/login" class="text-muted small text-decoration-none">
+                    <i class="fas fa-arrow-left me-1"></i>Back to User Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
