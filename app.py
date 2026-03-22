@@ -11,7 +11,7 @@ from datetime import datetime, date
 import json
 from flask_mail import Mail, Message
 import psycopg
-from psycopg2.extras import RealDictCursor
+from psycopg.rows import dict_row
 import pandas as pd
 import pickle
 import numpy as np
